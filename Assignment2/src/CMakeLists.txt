@@ -15,13 +15,24 @@ target_compile_options(rv64-emu PRIVATE
     -Weffc++
     -g
     -Og
-    -stdlib=libc++
 )
+
+# Check if the platform is macOS or WSL
+if(APPLE)
+    target_compile_options(rv64-emu PRIVATE 
+        -stdlib=libc++
+    )
+    target_link_libraries(rv64-emu PRIVATE
+        c++
+        c++abi
+    )
+elseif(UNIX AND NOT APPLE)
+    target_link_libraries(rv64-emu PRIVATE 
+        stdc++fs
+    )
+endif()
+
 
 # Optionally, you can set properties or link against other libraries
 # target_include_directories(my_library_name PRIVATE /path/to/other/include)
 # target_link_libraries(my_library_name PRIVATE other_library)
-target_link_libraries(rv64-emu PRIVATE
-    c++
-    c++abi
-)
