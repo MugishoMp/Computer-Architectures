@@ -1,0 +1,1 @@
+/Library/Developer/CommandLineTools/usr/bin/c++  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/getA_test.dir/getA_test.cpp.o -o getA_test  ../lib/libgtest.a ../lib/libgtest_main.a ../src/librv64-emu_lib.a ../lib/libgtest_main.a ../lib/libgtest.a 
