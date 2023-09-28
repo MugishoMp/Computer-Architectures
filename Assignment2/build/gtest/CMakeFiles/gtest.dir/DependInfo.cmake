@@ -1,18 +1,14 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
-  "CXX"
   )
-# The set of files for implicit dependencies of each language:
-set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/lib/googletest/src/gtest-all.cc" "/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/build/gtest/CMakeFiles/gtest.dir/src/gtest-all.cc.o"
-  )
-set(CMAKE_CXX_COMPILER_ID "GNU")
 
-# The include file search paths:
-set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "../include"
-  "../lib/googletest/include"
-  "../lib/googletest"
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/Users/mugisho/Documents/School2324/Computer-Architectures/Assignment2/lib/googletest/src/gtest-all.cc" "gtest/CMakeFiles/gtest.dir/src/gtest-all.cc.o" "gcc" "gtest/CMakeFiles/gtest.dir/src/gtest-all.cc.o.d"
   )
 
 # Targets to which this target links.
