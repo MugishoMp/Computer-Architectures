@@ -59,36 +59,123 @@ class IllegalInstruction : public std::runtime_error
 
 
 /* InstructionDecoder component to be used by class Processor */
+
+/*
+  * A thing to understand is that the location of these fields is in general always the same, except for some cases. 
+  * What does change however is what you will be getting.
+  * So which combination of getters you will be using. And this depends on on the instruction type that we are using.
+  * 
+  * */
 class InstructionDecoder
 {
   public:
-    void                setInstructionWord(const uint32_t instructionWord);
-    uint32_t            getInstructionWord() const;
-    
-    void                setInstructionType(const Type instructionType);
-    Type                getInstructionType() const;
+    /**
+     * Set the instruction word for decoding.
+     * @param instructionWord The 32-bit instruction word.
+     */
+    void setInstructionWord(const uint32_t instructionWord);
 
-    /*
-     * A thing to understand is that the location of these fields is in gereral always the same, except for some cases. 
-     * What does change however is what you will be getting.
-     * So which combination of getters you will be using. And this depends on on the instruction type that we are using.*/
+    /**
+     * Get the instruction word currently set for decoding.
+     * @return The 32-bit instruction word.
+     */
+    uint32_t getInstructionWord() const;
 
-    RegNumber           getA() const;
-    RegNumber           getB() const;
-    RegNumber           getD() const;
+    /**
+     * Set the instruction type.
+     * @param instructionType The type of the instruction (R, I, S, SH, J, F).
+     */
+    void setInstructionType(const Type instructionType);
 
-    /* TODO: probably want methods to get opcode, function code */
-    uint16_t            getOpcode() const;
-    uint8_t             getOp2() const;
-    uint8_t             getOp3() const;
+    /**
+     * Get the instruction type.
+     * @return The type of the instruction.
+     */
+    Type getInstructionType() const;
 
-    /* TODO: need a method to obtain the immediate */
-    uint16_t            getImmediateI() const;
-    uint32_t            getImmediateN() const;
+    /**
+     * Get the value of register A.
+     * @brief gets the bits at the bit positions 20-16
+     * in the case of a R, I, S, SH or F type instruction
+     * @return The value of register A.
+     */
+    RegNumber getA() const;
 
-    /* Methods for getting reserved and L fields */
-    uint8_t             getReserved() const;
-    uint8_t             getL() const;
+    /**
+     * Get the value of register B.
+     * @brief gets the bits at the bit positions 15-11
+     * in the case of a R or S type instruction
+     * @return The value of register B.
+     */
+    RegNumber getB() const;
+
+    /**
+     * Get the value of register D.
+     * @brief gets the bits at the bit positions 25-21
+     * in the case of a R, I or SH type instruction
+     * @return The value of register D.
+     */
+    RegNumber getD() const;
+
+    /**
+     * Get the opcode of the instruction.
+     * @brief gets the bits at the bit positions 31-26
+     * in the case of a R, I, S, SH or F type instruction
+     * @return The opcode.
+     */
+    uint16_t getOpcode() const;
+
+    /**
+     * Get the op2 field of the instruction.
+     * @brief gets the bits at the bit positions 9-8
+     * in the case of an R type instruction or the bits
+     * 7-6 in the case of an SH type instruction
+     * @return The op2 field.
+     */
+    uint8_t getOp2() const;
+
+    /**
+     * Get the op3 field of the instruction.
+     * @brief gets the bits at the bit positions 3-0
+     * in the case of a R type instruction
+     * @return The op3 field.
+     */
+    uint8_t getOp3() const;
+
+    /**
+     * Get the immediate value for I-type instructions.
+     * @brief gets the bits at the bit positions 15-0
+     * in the case of a I or F type instruction or the bits
+     * 10-0 in the case of an S type instruction
+     * @return The immediate value for I-type instructions.
+     */
+    uint16_t getImmediateI() const;
+
+    /**
+     * Get the immediate value for N-type instructions.
+     * @brief gets the bits at the bit positions 25-0
+     * in the case of a J type instruction 
+     * @return The immediate value for N-type instructions.
+     */
+    uint32_t getImmediateN() const;
+
+    /**
+     * Get the reserved field of the instruction.
+     * @brief gets the bits at the bit position 10 and 7-4
+     * in the case of a R type instruction or the bits
+     * 15-8 in the case of an S type instruction
+     * @return The reserved field.
+     */
+    uint8_t getReserved() const;
+
+    /**
+     * Get the L field of the instruction.
+     * @brief gets the bits at the bit positions 5-0
+     * in the case of a SH type instruction
+     * @return The L field.
+     */
+    uint8_t getL() const;
+
 
   private:
     uint32_t instructionWord;
