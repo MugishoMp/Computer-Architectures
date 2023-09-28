@@ -1,9 +1,12 @@
+# Assuming you have GTest available
+# find_package(GTest REQUIRED)
 
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-# set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-# FetchContent_MakeAvailable(googletest)
-
-# # Now simply link against gtest or gtest_main as needed. Eg
+# Add test files
 add_executable(getA_test getA_test.cpp)
+
+# Link against GTest, the main project library, and any other necessary libraries
+target_link_libraries(getA_test gtest gtest_main rv64-emu_lib)
+
 target_link_libraries(getA_test gtest_main)
-add_test(NAME getA_test COMMAND getA_test)
+# Register the test
+add_test(NAME GetATest COMMAND getA_test)

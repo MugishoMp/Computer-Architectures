@@ -1,0 +1,13 @@
+/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/build/CMakeFiles/rebuild_cache.dir
+/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/build/CMakeFiles/edit_cache.dir
+/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/build/gtest/CMakeFiles/rebuild_cache.dir
+/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/build/gtest/CMakeFiles/edit_cache.dir
+/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/build/gtest/CMakeFiles/gtest_main.dir
+/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/build/gtest/CMakeFiles/gtest.dir
+/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/build/src/CMakeFiles/rebuild_cache.dir
+/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/build/src/CMakeFiles/edit_cache.dir
+/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/build/src/CMakeFiles/rv64-emu_lib.dir
+/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/build/src/CMakeFiles/rv64-emu.dir
+/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/build/tst/CMakeFiles/rebuild_cache.dir
+/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/build/tst/CMakeFiles/edit_cache.dir
+/home/mugishoisrael/Documents/School2324/Computer-Architectures/Assignment2/build/tst/CMakeFiles/getA_test.dir

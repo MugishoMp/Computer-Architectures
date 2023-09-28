@@ -1,7 +1,8 @@
+# ./src/CMakeLists.txt
 set(BINARY ${CMAKE_PROJECT_NAME})
 
 # Add your source files here
-file(GLOB_RECURSE SOURCES LIST_DIRECTORIES true *.h *.cc)
+file(GLOB_RECURSE SOURCES LIST_DIRECTORIES true *.h *.cc *.cpp)
 
 set(SOURCES ${SOURCES})
 

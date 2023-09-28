@@ -1,3 +1,5 @@
+// getA_test.cpp
+
 #include <gtest/gtest.h>
 #include "inst-decoder.h"
 // Assuming the relevant headers are included here
