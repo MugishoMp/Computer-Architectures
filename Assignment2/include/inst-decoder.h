@@ -33,7 +33,7 @@ static const int INSTRUCTION_SIZE = 4;
 #define BITS_5_0   0x0000003F   // Represents 00000000 00000000 00000000 00111111
 #define BITS_3_0   0x0000000F   // Represents 00000000 00000000 00000000 00001111
 
-enum Type {
+enum InstructionType {
   R,
   I,
   S,
@@ -81,17 +81,17 @@ class InstructionDecoder
      */
     uint32_t getInstructionWord() const;
 
-    /**
-     * Set the instruction type.
-     * @param instructionType The type of the instruction (R, I, S, SH, J, F).
-     */
-    void setInstructionType(const Type instructionType);
+    // /**
+    //  * Set the instruction type.
+    //  * @param instructionType The type of the instruction (R, I, S, SH, J, F).
+    //  */
+    // void setInstructionType(const Type instructionType);
 
     /**
      * Get the instruction type.
      * @return The type of the instruction.
      */
-    Type getInstructionType() const;
+    InstructionType getInstructionType() const;
 
     /**
      * Get the value of register A.
@@ -143,19 +143,19 @@ class InstructionDecoder
     uint8_t getOp3() const;
 
     /**
-     * Get the immediate value for I-type instructions.
+     * Get the immediate value.
      * @brief gets the bits at the bit positions 15-0
      * in the case of a I or F type instruction or the bits
      * 10-0 in the case of an S type instruction
-     * @return The immediate value for I-type instructions.
+     * @return The immediate value I.
      */
     uint16_t getImmediateI() const;
 
     /**
-     * Get the immediate value for N-type instructions.
+     * Get the immediate value.
      * @brief gets the bits at the bit positions 25-0
      * in the case of a J type instruction 
-     * @return The immediate value for N-type instructions.
+     * @return The immediate N.
      */
     uint32_t getImmediateN() const;
 
@@ -179,7 +179,7 @@ class InstructionDecoder
 
   private:
     uint32_t instructionWord;
-    Type instructionType;
+    InstructionType instructionType;
 };
 
 std::ostream &operator<<(std::ostream &os, const InstructionDecoder &decoder);

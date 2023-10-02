@@ -27,15 +27,31 @@ InstructionDecoder::getInstructionWord() const
   return instructionWord;
 }
 
-void
-InstructionDecoder::setInstructionType(const Type instructionType) 
-{
-  this->instructionType = instructionType;
-}
+// void
+// InstructionDecoder::setInstructionType(const Type instructionType) 
+// {
+//   this->instructionType = instructionType;
+// }
 
-Type
+InstructionType
 InstructionDecoder::getInstructionType() const
 {
+  InstructionType instructionType = R;
+  // depending on the opcode we return a certain instruction type
+  uint16_t opCode = this->getOpcode();
+  if (opCode) {
+    instructionType = R;
+  } else if (opCode) {
+    instructionType = I;
+  } else if (opCode) {
+    instructionType = S;
+  } else if (opCode) {
+    instructionType = SH;
+  } else if (opCode) {
+    instructionType = J;
+  } else if (opCode) {
+    instructionType = F;
+  }
   return instructionType;
 }
 
