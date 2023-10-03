@@ -94,6 +94,14 @@ class InstructionDecoder
     InstructionType getInstructionType() const;
 
     /**
+     * Get the opcode of the instruction.
+     * @brief gets the bits at the bit positions 31-26
+     * in the case of a R, I, S, SH or F type instruction
+     * @return The opcode.
+     */
+    uint16_t getOpcode() const;
+
+    /**
      * Get the value of register A.
      * @brief gets the bits at the bit positions 20-16
      * in the case of a R, I, S, SH or F type instruction
@@ -116,14 +124,6 @@ class InstructionDecoder
      * @return The value of register D.
      */
     RegNumber getD() const;
-
-    /**
-     * Get the opcode of the instruction.
-     * @brief gets the bits at the bit positions 31-26
-     * in the case of a R, I, S, SH or F type instruction
-     * @return The opcode.
-     */
-    uint16_t getOpcode() const;
 
     /**
      * Get the op2 field of the instruction.
