@@ -112,7 +112,7 @@ TEST(InstructionDecoderTest, GetOpcodeShouldReturnCorrectValue) {
     // 0x1A - 0x68 - I
     // Test case 15: Instruction that is of instruction type I
     decoder.setInstructionWord(0x68000000);
-    EXPECT_EQ(decoder.getOpcode() , 0x00);
+    EXPECT_EQ(decoder.getOpcode() , 0x1A);
     // 0x1B - 0x6C - I
     // 0x1C - .
     // 0x1D - .
@@ -168,23 +168,27 @@ TEST(InstructionDecoderTest, GetAShouldReturnCorrectValue) {
 
     // Test for R-type instruction (opcode 0xE0)
     decoder.setInstructionWord(0xE01F0000); // Set opcode 0xE0 and register A bits to 
-    EXPECT_EQ(decoder.getA(), 0x1F);
+    EXPECT_EQ(decoder.getA(), 0x1F) << "R-type instruction";
 
     // Test for I-type instruction (opcode 0x68)
     decoder.setInstructionWord(0x681F0000); // Set opcode 0x68 and register A bits to 
-    EXPECT_EQ(decoder.getA(), 0x1F);
+    EXPECT_EQ(decoder.getA(), 0x1F) << "I-type instruction";
 
     // Test for S-type instruction (opcode 0xCC)
     decoder.setInstructionWord(0xCC1F0000); // Set opcode 0xCC and register A bits to 
-    EXPECT_EQ(decoder.getA(), 0x1F);
+    EXPECT_EQ(decoder.getA(), 0x1F) << "S-type instruction";
 
     // Test for SH-type instruction (opcode 0xB8)
     decoder.setInstructionWord(0xB81F0000); // Set opcode 0xB8 and register A bits to 
-    EXPECT_EQ(decoder.getA(), 0x1F);
+    EXPECT_EQ(decoder.getA(), 0x1F) << "SH-type instruction";
 
     // Test for F-type instruction (opcode 0xBC)
     decoder.setInstructionWord(0xBC1F0000); // Set opcode 0xBC and register A bits to 
-    EXPECT_EQ(decoder.getA(), 0x1F);
+    EXPECT_EQ(decoder.getA(), 0x1F) << "F-type instruction";
+
+    // Test for J-type instruction (opcode 0x00)
+    decoder.setInstructionWord(0x03FFFFFF); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getA(), FIELD_NOT_AVAILABLE_8_BIT) << "J-type instruction";
 }
 
 TEST(InstructionDecoderTest, GetBShouldReturnCorrectValue) {
@@ -194,9 +198,25 @@ TEST(InstructionDecoderTest, GetBShouldReturnCorrectValue) {
     decoder.setInstructionWord(0xE000F800); // Set opcode 0xE0 and register A bits to 
     EXPECT_EQ(decoder.getB(), 0x1F);
 
+    // Test for I-type instruction (opcode 0x68)
+    decoder.setInstructionWord(0x681F0000); // Set opcode 0x68 and register A bits to 
+    EXPECT_EQ(decoder.getB(), FIELD_NOT_AVAILABLE_8_BIT);
+
     // Test for S-type instruction (opcode 0xCC)
     decoder.setInstructionWord(0xCC00F800); // Set opcode 0xCC and register A bits to 
     EXPECT_EQ(decoder.getB(), 0x1F);
+
+    // Test for SH-type instruction (opcode 0xB8)
+    decoder.setInstructionWord(0xB81F0000); // Set opcode 0xB8 and register A bits to 
+    EXPECT_EQ(decoder.getB(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // Test for F-type instruction (opcode 0xBC)
+    decoder.setInstructionWord(0xBC1F0000); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getB(), FIELD_NOT_AVAILABLE_8_BIT); 
+
+    // Test for J-type instruction (opcode 0x00)
+    decoder.setInstructionWord(0x03FFFFFF); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getB(), FIELD_NOT_AVAILABLE_8_BIT);
 
     // Add more test cases as needed
 }
@@ -212,9 +232,21 @@ TEST(InstructionDecoderTest, GetDShouldReturnCorrectValue) {
     decoder.setInstructionWord(0x6BE00000); // Set opcode 0x68 and register A bits to 
     EXPECT_EQ(decoder.getD(), 0x1F);
 
+    // Test for S-type instruction (opcode 0xCC)
+    decoder.setInstructionWord(0xCC00F800); // Set opcode 0xCC and register A bits to 
+    EXPECT_EQ(decoder.getD(), FIELD_NOT_AVAILABLE_8_BIT);
+
     // Test for SH-type instruction (opcode 0xB8)
     decoder.setInstructionWord(0xBBE00000); // Set opcode 0xB8 and register A bits to 
     EXPECT_EQ(decoder.getD(), 0x1F);
+
+    // Test for F-type instruction (opcode 0xBC)
+    decoder.setInstructionWord(0xBC1F0000); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getD(), FIELD_NOT_AVAILABLE_8_BIT); 
+
+    // Test for J-type instruction (opcode 0x00)
+    decoder.setInstructionWord(0x03FFFFFF); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getD(), FIELD_NOT_AVAILABLE_8_BIT);
 
     // Add more test cases as needed
 }
@@ -227,10 +259,26 @@ TEST(InstructionDecoderTest, GetOp2ShouldReturnCorrectValue) {
     decoder.setInstructionWord(0xE0000300); // Set opcode 0xE0 and register A bits to 
     EXPECT_EQ(decoder.getOp2(), 0x3);
 
+    // Test for I-type instruction (opcode 0x68)
+    decoder.setInstructionWord(0x6BE00000); // Set opcode 0x68 and register A bits to 
+    EXPECT_EQ(decoder.getOp2(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // Test for S-type instruction (opcode 0xCC)
+    decoder.setInstructionWord(0xCC00F800); // Set opcode 0xCC and register A bits to 
+    EXPECT_EQ(decoder.getOp2(), FIELD_NOT_AVAILABLE_8_BIT);
+
     // Test for SH-type instruction (opcode 0xB8)
     // Retrieve from bits 7-6
     decoder.setInstructionWord(0xB80000C0); // Set opcode 0xB8 and register A bits to 
     EXPECT_EQ(decoder.getOp2(), 0x3);
+
+    // Test for F-type instruction (opcode 0xBC)
+    decoder.setInstructionWord(0xBC1F0000); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getOp2(), FIELD_NOT_AVAILABLE_8_BIT); 
+
+    // Test for J-type instruction (opcode 0x00)
+    decoder.setInstructionWord(0x03FFFFFF); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getOp2(), FIELD_NOT_AVAILABLE_8_BIT);
 
     // Add more test cases as needed
 }
@@ -243,11 +291,69 @@ TEST(InstructionDecoderTest, GetOp3ShouldReturnCorrectValue) {
     decoder.setInstructionWord(0xE000000F); // Set opcode 0xE0 and register A bits to 
     EXPECT_EQ(decoder.getOp3(), 0xF);
 
+    // Test for I-type instruction (opcode 0x68)
+    decoder.setInstructionWord(0x6BE00000); // Set opcode 0x68 and register A bits to 
+    EXPECT_EQ(decoder.getOp3(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // Test for S-type instruction (opcode 0xCC)
+    decoder.setInstructionWord(0xCC00F800); // Set opcode 0xCC and register A bits to 
+    EXPECT_EQ(decoder.getOp3(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // Test for SH-type instruction (opcode 0xB8)
+    // Retrieve from bits 7-6
+    decoder.setInstructionWord(0xB80000C0); // Set opcode 0xB8 and register A bits to 
+    EXPECT_EQ(decoder.getOp3(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // Test for F-type instruction (opcode 0xBC)
+    decoder.setInstructionWord(0xBC1F0000); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getOp3(), FIELD_NOT_AVAILABLE_8_BIT); 
+
+    // Test for J-type instruction (opcode 0x00)
+    decoder.setInstructionWord(0x03FFFFFF); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getOp3(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // Add more test cases as needed
+}
+
+TEST(InstructionDecoderTest, GetFunctionCodeShouldReturnCorrectValue) {
+    InstructionDecoder decoder;
+
+    // Test for R-type instruction (opcode 0xE0)
+    // Retrieve from bits 3-0
+    decoder.setInstructionWord(0xE000030F); // Set opcode 0xE0 and register A bits to 
+    EXPECT_EQ(decoder.getFunctionCode(), 0x3F);
+
+    // Test for I-type instruction (opcode 0x68)
+    decoder.setInstructionWord(0x6BE00000); // Set opcode 0x68 and register A bits to 
+    EXPECT_EQ(decoder.getFunctionCode(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // Test for S-type instruction (opcode 0xCC)
+    decoder.setInstructionWord(0xCC00F800); // Set opcode 0xCC and register A bits to 
+    EXPECT_EQ(decoder.getFunctionCode(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // Test for SH-type instruction (opcode 0xB8)
+    // Retrieve from bits 7-6
+    decoder.setInstructionWord(0xB80000C0); // Set opcode 0xB8 and register A bits to 
+    EXPECT_EQ(decoder.getFunctionCode(), 0x3);
+
+    // Test for F-type instruction (opcode 0xBC)
+    decoder.setInstructionWord(0xBC1F0000); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getFunctionCode(), FIELD_NOT_AVAILABLE_8_BIT); 
+
+    // Test for J-type instruction (opcode 0x00)
+    decoder.setInstructionWord(0x03FFFFFF); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getFunctionCode(), FIELD_NOT_AVAILABLE_8_BIT);
+
     // Add more test cases as needed
 }
 
 TEST(InstructionDecoderTest, GetImmediateIShouldReturnCorrectValue) {
     InstructionDecoder decoder;
+
+    // Test for R-type instruction (opcode 0xE0)
+    // Retrieve from bits 3-0
+    decoder.setInstructionWord(0xE000000F); // Set opcode 0xE0 and register A bits to 
+    EXPECT_EQ(decoder.getImmediateI(), FIELD_NOT_AVAILABLE_16_BIT);
 
     // Test for I-type instruction (opcode 0x68)
     // Retrieve from bits 15-0
@@ -256,19 +362,53 @@ TEST(InstructionDecoderTest, GetImmediateIShouldReturnCorrectValue) {
 
     // Test for S-type instruction (opcode 0xCC)
     // Retrieve from bits 15-0
-    decoder.setInstructionWord(0xCC00FFFF); // Set opcode 0xCC and register A bits to 
-    EXPECT_EQ(decoder.getImmediateI(), 0xFFFF);
+    decoder.setInstructionWord(0xCC0007FF); // Set opcode 0xCC and register A bits to 
+    EXPECT_EQ(decoder.getImmediateI(), 0x7FF);
+
+    // Test for SH-type instruction (opcode 0xB8)
+    // Retrieve from bits 7-6
+    decoder.setInstructionWord(0xB80000C0); // Set opcode 0xB8 and register A bits to 
+    EXPECT_EQ(decoder.getImmediateI(), FIELD_NOT_AVAILABLE_16_BIT);
 
     // Test for F-type instruction (opcode 0xBC)
     // Retrieve from bits 10-0
-    decoder.setInstructionWord(0xBC0007FF); // Set opcode 0xBC and register A bits to 
-    EXPECT_EQ(decoder.getImmediateI(), 0x7FF);
+    decoder.setInstructionWord(0xBC00FFFF); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getImmediateI(), 0xFFFF);
+
+    // Test for J-type instruction (opcode 0x00)
+    decoder.setInstructionWord(0x03FFFFFF); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getImmediateI(), FIELD_NOT_AVAILABLE_16_BIT);
 
     // Add more test cases as needed
 }
 
 TEST(InstructionDecoderTest, GetImmediateNShouldReturnCorrectValue) {
     InstructionDecoder decoder;
+
+    // Test for R-type instruction (opcode 0xE0)
+    // Retrieve from bits 3-0
+    decoder.setInstructionWord(0xE000000F); // Set opcode 0xE0 and register A bits to 
+    EXPECT_EQ(decoder.getImmediateN(), FIELD_NOT_AVAILABLE_32_BIT);
+
+    // Test for I-type instruction (opcode 0x68)
+    // Retrieve from bits 15-0
+    decoder.setInstructionWord(0x6800FFFF); // Set opcode 0x68 and register A bits to 
+    EXPECT_EQ(decoder.getImmediateN(), FIELD_NOT_AVAILABLE_32_BIT);
+
+    // Test for S-type instruction (opcode 0xCC)
+    // Retrieve from bits 15-0
+    decoder.setInstructionWord(0xCC00FFFF); // Set opcode 0xCC and register A bits to 
+    EXPECT_EQ(decoder.getImmediateN(), FIELD_NOT_AVAILABLE_32_BIT);
+
+    // Test for SH-type instruction (opcode 0xB8)
+    // Retrieve from bits 7-6
+    decoder.setInstructionWord(0xB80000C0); // Set opcode 0xB8 and register A bits to 
+    EXPECT_EQ(decoder.getImmediateN(), FIELD_NOT_AVAILABLE_32_BIT);
+
+    // Test for F-type instruction (opcode 0xBC)
+    // Retrieve from bits 10-0
+    decoder.setInstructionWord(0xBC0007FF); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getImmediateN(), FIELD_NOT_AVAILABLE_32_BIT);
 
     // Test for J-type instruction (opcode 0x00)
     decoder.setInstructionWord(0x03FFFFFF); // Set opcode 0xBC and register A bits to 
@@ -284,9 +424,29 @@ TEST(InstructionDecoderTest, GetReservedShouldReturnCorrectValue) {
     decoder.setInstructionWord(0xE00004F0); // Set opcode 0xE0 and register A bits to 
     EXPECT_EQ(decoder.getReserved(), 0x1F);
 
+    // Test for I-type instruction (opcode 0x68)
+    // Retrieve from bits 15-0
+    decoder.setInstructionWord(0x6800FFFF); // Set opcode 0x68 and register A bits to 
+    EXPECT_EQ(decoder.getReserved(), FIELD_NOT_AVAILABLE_8_BIT);
+
     // Test for S-type instruction (opcode 0xCC)
-    decoder.setInstructionWord(0xCC00FF00); // Set opcode 0xCC and register A bits to 
+    decoder.setInstructionWord(0xCC0000C0); // Set opcode 0xCC and register A bits to 
+    EXPECT_EQ(decoder.getReserved(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // Test for SH-type instruction (opcode 0xB8)
+    // Retrieve from bits 7-6
+    decoder.setInstructionWord(0xB800FF00); // Set opcode 0xB8 and register A bits to 
     EXPECT_EQ(decoder.getReserved(), 0xFF);
+
+    // Test for F-type instruction (opcode 0xBC)
+    // Retrieve from bits 10-0
+    decoder.setInstructionWord(0xBC0007FF); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getReserved(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // Test for J-type instruction (opcode 0x00)
+    decoder.setInstructionWord(0x03FFFFFF); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getReserved(), FIELD_NOT_AVAILABLE_8_BIT);
+
 
     // Add more test cases as needed
 }
@@ -294,9 +454,31 @@ TEST(InstructionDecoderTest, GetReservedShouldReturnCorrectValue) {
 TEST(InstructionDecoderTest, GetLShouldReturnCorrectValue) {
     InstructionDecoder decoder;
 
+    // Test for R-type instruction (opcode 0xE0)
+    decoder.setInstructionWord(0xE00004F0); // Set opcode 0xE0 and register A bits to 
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // Test for I-type instruction (opcode 0x68)
+    // Retrieve from bits 15-0
+    decoder.setInstructionWord(0x6800FFFF); // Set opcode 0x68 and register A bits to 
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // Test for S-type instruction (opcode 0xCC)
+    decoder.setInstructionWord(0xCC00FF00); // Set opcode 0xCC and register A bits to 
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+
     // Test for SH-type instruction (opcode 0xB8)
     decoder.setInstructionWord(0xB800003F); // Set opcode 0xB8 and register A bits to 
     EXPECT_EQ(decoder.getL(), 0x3F);
+
+    // Test for F-type instruction (opcode 0xBC)
+    // Retrieve from bits 10-0
+    decoder.setInstructionWord(0xBC0007FF); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // Test for J-type instruction (opcode 0x00)
+    decoder.setInstructionWord(0x03FFFFFF); // Set opcode 0xBC and register A bits to 
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
 
     // Add more test cases as needed
 }

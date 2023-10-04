@@ -32,6 +32,9 @@ static const int INSTRUCTION_SIZE = 4;
 #define BITS_7_4   0x000000F0   // Represents 00000000 00000000 00000000 11110000
 #define BITS_5_0   0x0000003F   // Represents 00000000 00000000 00000000 00111111
 #define BITS_3_0   0x0000000F   // Represents 00000000 00000000 00000000 00001111
+#define FIELD_NOT_AVAILABLE_8_BIT 255     // Value outside the range of valid values for 8-bit.
+#define FIELD_NOT_AVAILABLE_16_BIT 65535  // Value outside the range of valid values for 16-bit.
+#define FIELD_NOT_AVAILABLE_32_BIT 4294967295  // Value outside the range of valid values for 32-bit.
 
 enum InstructionType {
   R,
@@ -40,6 +43,56 @@ enum InstructionType {
   SH,
   J,
   F
+};
+
+enum opCode {
+  lJ,
+  lJal,
+  lBf,
+  lBnf,
+  lNop,
+  lMovhi,
+  lJr,
+  lLwz,
+  lLbz,
+  lLbs,
+  lAddi,
+  lOri,
+  lSw,
+  lSb,
+  lOr,
+  lAdd,
+  lSll,
+  lSra,
+  lSub,
+  lSfeq,
+  lSfges,
+  lSfles
+};
+
+enum Function {
+  lJ,
+  lJal,
+  lBf,
+  lBnf,
+  lNop,
+  lMovhi,
+  lJr,
+  lLwz,
+  lLbz,
+  lLbs,
+  lAddi,
+  lOri,
+  lSw,
+  lSb,
+  lOr,
+  lAdd,
+  lSll,
+  lSra,
+  lSub,
+  lSfeq,
+  lSfges,
+  lSfles
 };
 
 /* Exception that should be thrown when an illegal instruction
@@ -100,7 +153,31 @@ class InstructionDecoder
      * @return The opcode.
      */
     uint16_t getOpcode() const;
+    /**
+     * Get the op2 field of the instruction.
+     * @brief gets the bits at the bit positions 9-8
+     * in the case of an R type instruction or the bits
+     * 7-6 in the case of an SH type instruction
+     * @return The op2 field.
+     */
+    uint8_t getOp2() const;
 
+    /**
+     * Get the op3 field of the instruction.
+     * @brief gets the bits at the bit positions 3-0
+     * in the case of a R type instruction
+     * @return The op3 field.
+     */
+    uint8_t getOp3() const;
+
+    /**
+     * Get FunctionCode of the instruction.
+     * @brief gets the bits at the bit positions
+     * in the case of a R type instruction
+     * @return The FunctionCode.
+     */
+    uint8_t getFunctionCode() const;
+    
     /**
      * Get the value of register A.
      * @brief gets the bits at the bit positions 20-16
@@ -124,23 +201,6 @@ class InstructionDecoder
      * @return The value of register D.
      */
     RegNumber getD() const;
-
-    /**
-     * Get the op2 field of the instruction.
-     * @brief gets the bits at the bit positions 9-8
-     * in the case of an R type instruction or the bits
-     * 7-6 in the case of an SH type instruction
-     * @return The op2 field.
-     */
-    uint8_t getOp2() const;
-
-    /**
-     * Get the op3 field of the instruction.
-     * @brief gets the bits at the bit positions 3-0
-     * in the case of a R type instruction
-     * @return The op3 field.
-     */
-    uint8_t getOp3() const;
 
     /**
      * Get the immediate value.
