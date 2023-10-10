@@ -19,13 +19,19 @@ static const int INSTRUCTION_SIZE = 4;
 
 #define BITS_31_26 0xFC000000   // Represents 11111100 00000000 00000000 00000000
 #define BITS_31_21 0xFFE00000   // Represents 11111111 11100000 00000000 00000000
-#define BITS_25_21 0x03E00000   // Represents 00000000 00111110 00000000 00000000
-#define BITS_25_0  0x03FFFFFF   // Represents 00000000 00111111 11111111 11111111
-#define BITS_20_16 0x001F0000   // Represents 00000000 00000000 00011111 00000000
-#define BITS_15_11 0x0000F800   // Represents 00000000 00000000 00001111 10000000
+#define BITS_25_21 0x03E00000   // Represents 00000011 11100000 00000000 00000000
+#define BITS_25_16 0x03FF0000   // Represents 00000011 11111111 00000000 00000000
+#define BITS_25_0  0x03FFFFFF   // Represents 00000011 11111111 11111111 11111111
+#define BITS_23_16 0x00FF0000   // Represents 00000000 11111111 00000000 00000000
+#define BITS_20_17 0x001E0000   // Represents 00000000 00011110 00000000 00000000
+#define BITS_20_16 0x001F0000   // Represents 00000000 00011111 00000000 00000000
+#define BITS_15_11 0x0000F800   // Represents 00000000 00000000 11111000 00000000
 #define BITS_15_8  0x0000FF00   // Represents 00000000 00000000 11111111 00000000
 #define BITS_15_0  0x0000FFFF   // Represents 00000000 00000000 11111111 11111111
 #define BITS_10_0  0x000007FF   // Represents 00000000 00000000 00000111 11111111
+#define BITS_10_4  0x000007F0   // Represents 00000000 00000000 00000111 11110000
+#define BITS_10_5  0x000007E0   // Represents 00000000 00000000 00000111 11100000
+#define BITS_10_8  0x00000700   // Represents 00000000 00000000 00000111 00000000
 #define BITS_10    0x00000400   // Represents 00000000 00000000 00000100 00000000
 #define BITS_9_8   0x00000300   // Represents 00000000 00000000 00000011 00000000
 #define BITS_7_6   0x000000C0   // Represents 00000000 00000000 00000000 11000000
@@ -37,62 +43,26 @@ static const int INSTRUCTION_SIZE = 4;
 #define FIELD_NOT_AVAILABLE_32_BIT 4294967295  // Value outside the range of valid values for 32-bit.
 
 enum InstructionType {
+  INVALID,
   R,
   I,
   S,
   SH,
   J,
-  F
-};
-
-enum opCode {
-  lJ,
-  lJal,
-  lBf,
-  lBnf,
-  lNop,
-  lMovhi,
-  lJr,
-  lLwz,
-  lLbz,
-  lLbs,
-  lAddi,
-  lOri,
-  lSw,
-  lSb,
-  lOr,
-  lAdd,
-  lSll,
-  lSra,
-  lSub,
-  lSfeq,
-  lSfges,
-  lSfles
-};
-
-enum Function {
-  lJ,
-  lJal,
-  lBf,
-  lBnf,
-  lNop,
-  lMovhi,
-  lJr,
-  lLwz,
-  lLbz,
-  lLbs,
-  lAddi,
-  lOri,
-  lSw,
-  lSb,
-  lOr,
-  lAdd,
-  lSll,
-  lSra,
-  lSub,
-  lSfeq,
-  lSfges,
-  lSfles
+  F,
+  DN,
+  ORK,
+  DROK,
+  OK,
+  RES,
+  DABROO,
+  RBR,
+  RAI,
+  DAK,
+  KABK,
+  RABRO,
+  OABR,
+  DABLK
 };
 
 /* Exception that should be thrown when an illegal instruction
@@ -153,6 +123,7 @@ class InstructionDecoder
      * @return The opcode.
      */
     uint16_t getOpcode() const;
+    
     /**
      * Get the op2 field of the instruction.
      * @brief gets the bits at the bit positions 9-8
@@ -236,6 +207,19 @@ class InstructionDecoder
      */
     uint8_t getL() const;
 
+    /**
+     * @brief 
+     * 
+     * @return uint32_t 
+     */ */
+    uint32_t getK() const;
+
+    // /**
+    //  * @brief 
+    //  * 
+    //  * @return uint8_t 
+    //  */ */
+    // uint8_t getO() const;
 
   private:
     uint32_t instructionWord;
