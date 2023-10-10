@@ -117,7 +117,7 @@ InstructionDecoder::getInstructionType() const
     case 0x35:
     case 0x36:
     case 0x37:
-      InstructionType = S;
+      instructionType = S;
       break;
     case 0x38:
       instructionType = R;
@@ -150,10 +150,10 @@ InstructionDecoder::getOpcode() const
   return opcode;  /* result undefined */
 }
 
-uint8_t
+uint32_t
 InstructionDecoder::getOp2() const
 {
-  uint8_t op2 = 0;
+  uint32_t op2 = FIELD_NOT_AVAILABLE_32_BIT;
 
   switch (getInstructionType()) {
     case R:
@@ -174,13 +174,16 @@ InstructionDecoder::getOp2() const
       break;
     case DABROO:
       op2 = (getInstructionWord() & BITS_7_4) >> 4; // Right shift by 8 bits
-      if (op2 < 12) op2 = (getInstructionWord() & BITS_7_0) >> 0;
+      if (op2 < 0b1100) op2 = (getInstructionWord() & BITS_7_0) >> 0;
+      break;
+    case RABRO:
+      op2 = (getInstructionWord() & BITS_3_0) >> 0;
       break;
     case OABR:
-      op2 = (getInstructionWord() & BITS_25_16) >> 16; // Right shift by 8 bits
+      op2 = (getInstructionWord() & BITS_25_21) >> 21; // Right shift by 8 bits
       break;
     default:
-      op2 = FIELD_NOT_AVAILABLE_8_BIT;
+      op2 = FIELD_NOT_AVAILABLE_32_BIT;
   }
 
   return op2;  /* result undefined */
@@ -189,91 +192,17 @@ InstructionDecoder::getOp2() const
 uint8_t
 InstructionDecoder::getOp3() const
 {
-  uint8_t op3 = 0;
+  uint8_t op3 = FIELD_NOT_AVAILABLE_8_BIT;
 
   switch (getInstructionType()) {
     case R:
       op3 = (getInstructionWord() & BITS_3_0) >> 0; // Right shift by 8 bits
       break;
-    case DABROO:
     default:
       op3 = FIELD_NOT_AVAILABLE_8_BIT;
   }
 
   return op3;  /* result undefined */
-}
-
-RegNumber
-InstructionDecoder::getA() const
-{
-  RegNumber A = 0;
-
-  switch (getInstructionType()) {
-    case R:
-    case I:
-    case S:
-    case SH:
-    case F:
-    case DABROO:
-    case RAI:
-    case DAK:
-    case KABK:
-    case RABR:
-    case OABR:
-    case DABLK:
-      A = (getInstructionWord() & BITS_20_16) >> 16; // Right shift by 8 bits
-      break;
-    default:
-      A = FIELD_NOT_AVAILABLE_8_BIT;
-  }
-
-  return A;  /* result undefined */
-}
-
-RegNumber
-InstructionDecoder::getB() const
-{
-  RegNumber B = 0;
-
-  switch (getInstructionType()) {
-    case R:
-    case S:
-    case DABROO:
-    case RBR:
-    case KABK:
-    case RABR:
-    case OABR:
-    case DABLK:
-      B = (getInstructionWord() & BITS_15_11) >> 11; // Right shift by 8 bits
-      break;
-    default:
-      B = FIELD_NOT_AVAILABLE_8_BIT;
-  }
-
-  return B;  /* result undefined */
-}
-
-RegNumber
-InstructionDecoder::getD() const
-{
-  RegNumber D = 0;
-
-  switch (getInstructionType()) {
-    case R:
-    case I:
-    case SH:
-    case DN:
-    case DROK:
-    case DABROO:
-    case DAK:
-    case DABL:
-      D = (getInstructionWord() & BITS_25_21) >> 21; // Right shift by 8 bits
-      break;
-    default:
-      D = FIELD_NOT_AVAILABLE_8_BIT;
-  }
-
-  return D;  /* result undefined */
 }
 
 // uint8_t
@@ -305,10 +234,83 @@ InstructionDecoder::getD() const
 //   return op2;  /* result undefined */
 // }
 
+RegNumber
+InstructionDecoder::getA() const
+{
+  RegNumber A = FIELD_NOT_AVAILABLE_8_BIT;
+
+  switch (getInstructionType()) {
+    case R:
+    case I:
+    case S:
+    case SH:
+    case F:
+    case DABROO:
+    case RAI:
+    case DAK:
+    case KABK:
+    case RABRO:
+    case OABR:
+    case DABLK:
+      A = (getInstructionWord() & BITS_20_16) >> 16; // Right shift by 8 bits
+      break;
+    default:
+      A = FIELD_NOT_AVAILABLE_8_BIT;
+  }
+
+  return A;  /* result undefined */
+}
+
+RegNumber
+InstructionDecoder::getB() const
+{
+  RegNumber B = FIELD_NOT_AVAILABLE_8_BIT;
+
+  switch (getInstructionType()) {
+    case R:
+    case S:
+    case DABROO:
+    case RBR:
+    case KABK:
+    case RABRO:
+    case OABR:
+    case DABLK:
+      B = (getInstructionWord() & BITS_15_11) >> 11; // Right shift by 8 bits
+      break;
+    default:
+      B = FIELD_NOT_AVAILABLE_8_BIT;
+  }
+
+  return B;  /* result undefined */
+}
+
+RegNumber
+InstructionDecoder::getD() const
+{
+  RegNumber D = FIELD_NOT_AVAILABLE_8_BIT;
+
+  switch (getInstructionType()) {
+    case R:
+    case I:
+    case SH:
+    case DN:
+    case DROK:
+    case DABROO:
+    case DAK:
+    case DABLK:
+      D = (getInstructionWord() & BITS_25_21) >> 21; // Right shift by 8 bits
+      break;
+    default:
+      D = FIELD_NOT_AVAILABLE_8_BIT;
+  }
+
+  return D;  /* result undefined */
+}
+
 uint16_t
 InstructionDecoder::getImmediateI() const
 {
-  uint16_t immediateI = 0;
+  uint16_t immediateI = FIELD_NOT_AVAILABLE_16_BIT;
 
   switch (getInstructionType()) {
     case I:
@@ -329,13 +331,14 @@ InstructionDecoder::getImmediateI() const
 uint32_t
 InstructionDecoder::getImmediateN() const
 {
-  uint32_t immediateN = 0;
+  uint32_t immediateN = FIELD_NOT_AVAILABLE_32_BIT;
 
   switch (getInstructionType()) {
     case J:
       immediateN = (getInstructionWord() & BITS_25_0) >> 0; // Right shift by 8 bits
       break;
     case DN:
+      immediateN = (getInstructionWord() & BITS_20_0) >> 0; // Right shift by 8 bits
       break;
     default:
       immediateN = FIELD_NOT_AVAILABLE_32_BIT;
@@ -347,7 +350,7 @@ InstructionDecoder::getImmediateN() const
 uint32_t
 InstructionDecoder::getReserved() const
 {
-  uint32_t reserved = 0;
+  uint32_t reserved = FIELD_NOT_AVAILABLE_32_BIT;
 
   switch (getInstructionType()) {
     case R:
@@ -360,13 +363,33 @@ InstructionDecoder::getReserved() const
       reserved = (getInstructionWord() & BITS_23_16) >> 16; // Right shift by 8 bits
       break;
     case DROK:
-      reserved = (getInstructionWord() & BITS_23_17) >> 17; // Right shift by 8 bits
+      reserved = (getInstructionWord() & BITS_20_17) >> 17; // Right shift by 8 bits
       break;
     case RES:
       reserved = (getInstructionWord() & BITS_25_0) >> 0; // Right shift by 8 bits
       break; 
     case DABROO:
-      reserved = (getInstructionWord() & BITS_10_8) >> 8; // Right shift by 8 bits
+      if (getOpcode() == 0x0A) {
+        if (getOp2() > 0b1100)          
+          reserved = (((getInstructionWord() & BITS_25_8) >> 8) << 4) | ((getInstructionWord() & BITS_3_0)); // Right shift by 8 bits
+        else
+          reserved = (getInstructionWord() & BITS_10_8) >> 8; // Right shift by 8 bits
+      } else if (getOpcode() == 0x32) {
+        if((getOp2() >= 0b1000 && getOp2() <= 0b1101) || (getOp2() >= 0b00101000 && getOp2() <= 0b00110101))
+          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 3) | ((getInstructionWord() & BITS_10_8) >> 0);
+        else if((getOp2() >= 0b00011000 && getOp2() <= 0b00011101) || (getOp2() >= 0b1110000 && getOp2() <= 0b111110))
+          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 5) | ((getInstructionWord() & BITS_10) >> 0);
+        else if(getOp2() >= 0b0000 && getOp2() <= 0b00110100)
+          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 5) | ((getInstructionWord() & BITS_9_8) >> 0);
+        else if(getOp2() == 0b00110101)
+          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 5) | ((getInstructionWord() & BITS_10) >> 0) | ((getInstructionWord() & BITS_8) >> 0);
+        else if(getOp2() == 0b1101 || getOp2() == 0b1110)
+          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 4) | ((getInstructionWord() & BITS_3_0) >> 0);
+        else if(getOp2() >= 0b0000 && getOp2() <= 0b0111)
+          reserved = (getInstructionWord() & BITS_10_8) >> 8; // Right shift by 8 bits
+        else if(getOp2() == 0b00010101 || getOp2() == 0b00010100)
+          reserved = (getInstructionWord() & BITS_8) >> 8; // Right shift by 8 bits
+      }
       break;
     case RBR:
       reserved = (((getInstructionWord() & BITS_25_16) >> 16) << 11) | ((getInstructionWord() & BITS_10_0) >> 0);
@@ -381,7 +404,7 @@ InstructionDecoder::getReserved() const
       reserved = (getInstructionWord() & BITS_10_0) >> 0; // Right shift by 8 bits
       break;
     default:
-      reserved = FIELD_NOT_AVAILABLE_8_BIT;
+      reserved = FIELD_NOT_AVAILABLE_32_BIT;
   }
 
   return reserved;  /* result undefined */
@@ -390,7 +413,7 @@ InstructionDecoder::getReserved() const
 uint8_t
 InstructionDecoder::getL() const
 {
-  uint8_t L = 0;
+  uint8_t L = FIELD_NOT_AVAILABLE_8_BIT;
 
   switch (getInstructionType()) {
     case SH:
@@ -409,7 +432,7 @@ InstructionDecoder::getL() const
 uint32_t
 InstructionDecoder::getK() const
 {
-  uint32_t K = 0;
+  uint32_t K = FIELD_NOT_AVAILABLE_32_BIT;
 
   switch (getInstructionType()) {
     case DABLK:

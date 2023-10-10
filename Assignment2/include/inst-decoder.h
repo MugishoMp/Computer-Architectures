@@ -21,10 +21,14 @@ static const int INSTRUCTION_SIZE = 4;
 #define BITS_31_21 0xFFE00000   // Represents 11111111 11100000 00000000 00000000
 #define BITS_25_21 0x03E00000   // Represents 00000011 11100000 00000000 00000000
 #define BITS_25_16 0x03FF0000   // Represents 00000011 11111111 00000000 00000000
+#define BITS_25_24 0x03000000   // Represents 00000011 00000000 00000000 00000000
+#define BITS_25_8  0x03FFFF00   // Represents 00000011 11111111 11111111 00000000
 #define BITS_25_0  0x03FFFFFF   // Represents 00000011 11111111 11111111 11111111
 #define BITS_23_16 0x00FF0000   // Represents 00000000 11111111 00000000 00000000
 #define BITS_20_17 0x001E0000   // Represents 00000000 00011110 00000000 00000000
 #define BITS_20_16 0x001F0000   // Represents 00000000 00011111 00000000 00000000
+#define BITS_20_0  0x001FFFFF   // Represents 00000000 00011111 11111111 11111111
+#define BITS_16    0x00010000   // Represents 00000000 00000001 00000000 00000000
 #define BITS_15_11 0x0000F800   // Represents 00000000 00000000 11111000 00000000
 #define BITS_15_8  0x0000FF00   // Represents 00000000 00000000 11111111 00000000
 #define BITS_15_0  0x0000FFFF   // Represents 00000000 00000000 11111111 11111111
@@ -34,8 +38,10 @@ static const int INSTRUCTION_SIZE = 4;
 #define BITS_10_8  0x00000700   // Represents 00000000 00000000 00000111 00000000
 #define BITS_10    0x00000400   // Represents 00000000 00000000 00000100 00000000
 #define BITS_9_8   0x00000300   // Represents 00000000 00000000 00000011 00000000
+#define BITS_8     0x00000100   // Represents 00000000 00000000 00000001 00000000
 #define BITS_7_6   0x000000C0   // Represents 00000000 00000000 00000000 11000000
 #define BITS_7_4   0x000000F0   // Represents 00000000 00000000 00000000 11110000
+#define BITS_7_0   0x000000FF   // Represents 00000000 00000000 00000000 11111111
 #define BITS_5_0   0x0000003F   // Represents 00000000 00000000 00000000 00111111
 #define BITS_3_0   0x0000000F   // Represents 00000000 00000000 00000000 00001111
 #define FIELD_NOT_AVAILABLE_8_BIT 255     // Value outside the range of valid values for 8-bit.
@@ -131,7 +137,7 @@ class InstructionDecoder
      * 7-6 in the case of an SH type instruction
      * @return The op2 field.
      */
-    uint8_t getOp2() const;
+    uint32_t getOp2() const;
 
     /**
      * Get the op3 field of the instruction.
@@ -197,7 +203,7 @@ class InstructionDecoder
      * 15-8 in the case of an S type instruction
      * @return The reserved field.
      */
-    uint8_t getReserved() const;
+    uint32_t getReserved() const;
 
     /**
      * Get the L field of the instruction.
@@ -211,7 +217,7 @@ class InstructionDecoder
      * @brief 
      * 
      * @return uint32_t 
-     */ */
+     */
     uint32_t getK() const;
 
     // /**
