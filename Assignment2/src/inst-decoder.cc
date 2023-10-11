@@ -205,6 +205,8 @@ InstructionDecoder::getOp3() const
   return op3;  /* result undefined */
 }
 
+
+// function that maps opcode + op2 + op3 to an enum
 // uint8_t
 // InstructionDecoder::getFunctionCode() const
 // {
@@ -370,19 +372,19 @@ InstructionDecoder::getReserved() const
       break; 
     case DABROO:
       if (getOpcode() == 0x0A) {
-        if (getOp2() > 0b1100)          
+        if (getOp2() >= 0b1100 && getOp2() <= 0b1111)          
           reserved = (((getInstructionWord() & BITS_25_8) >> 8) << 4) | ((getInstructionWord() & BITS_3_0)); // Right shift by 8 bits
         else
           reserved = (getInstructionWord() & BITS_10_8) >> 8; // Right shift by 8 bits
       } else if (getOpcode() == 0x32) {
         if((getOp2() >= 0b1000 && getOp2() <= 0b1101) || (getOp2() >= 0b00101000 && getOp2() <= 0b00101110))
-          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 3) | ((getInstructionWord() & BITS_10_8) >> 0);
+          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 3) | ((getInstructionWord() & BITS_10_8) >> 8);
         else if((getOp2() >= 0b00011000 && getOp2() <= 0b00011101) || (getOp2() >= 0b111000 && getOp2() <= 0b00111110))
-          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 5) | ((getInstructionWord() & BITS_10) >> 0);
+          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 1) | ((getInstructionWord() & BITS_10) >> 10);
         else if(getOp2() >= 0b0000 && getOp2() <= 0b00110100)
-          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 5) | ((getInstructionWord() & BITS_9_8) >> 0);
+          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 2) | ((getInstructionWord() & BITS_9_8) >> 8);
         else if(getOp2() == 0b00110101)
-          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 5) | ((getInstructionWord() & BITS_10) >> 0) | ((getInstructionWord() & BITS_8) >> 0);
+          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 2) | ((getInstructionWord() & BITS_10) >> 10)  << 1| ((getInstructionWord() & BITS_8) >> 8);
         else if(getOp2() == 0b1101 || getOp2() == 0b1110)
           reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 4) | ((getInstructionWord() & BITS_3_0) >> 0);
         else if(getOp2() >= 0b0000 && getOp2() <= 0b0111)
@@ -398,7 +400,7 @@ InstructionDecoder::getReserved() const
       reserved = (getInstructionWord() & BITS_25_21) >> 21; // Right shift by 8 bits
       break;
     case RABRO:
-      reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 7) | ((getInstructionWord() & BITS_10_4) >> 0);
+      reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 7) | ((getInstructionWord() & BITS_10_4) >> 4);
       break;
     case OABR:
       reserved = (getInstructionWord() & BITS_10_0) >> 0; // Right shift by 8 bits

@@ -799,32 +799,59 @@ TEST(InstructionDecoderTest, GetReservedShouldReturnCorrectValue) {
         EXPECT_EQ(decoder.getReserved(), 0x3FFFFFF);
     }
 
-    // // For DABROO Type
-    // uint8_t dabroo_opcodes[] = {0x0A, 0x32};
-    // for (auto op : dabroo_opcodes) {
-    //     decoder.setInstructionWord((op << 26));
-    //     EXPECT_EQ(decoder.getReserved(), FIELD_NOT_AVAILABLE_32_BIT);
-    // }
-
-    // // For RBR Type
-    // uint8_t rbr_opcodes[] = {0x11, 0x12};
-    // for (auto op : rbr_opcodes) {
-    //     decoder.setInstructionWord((op << 26));
-    //     EXPECT_EQ(decoder.getReserved(), FIELD_NOT_AVAILABLE_32_BIT);
-    // }
-
-    // // For RAI Type
-    // decoder.setInstructionWord((0x13 << 26));
-    // EXPECT_EQ(decoder.getReserved(), FIELD_NOT_AVAILABLE_32_BIT);
-
-    // // For RABRO Type
-    // decoder.setInstructionWord((0x31 << 26));
-    // EXPECT_EQ(decoder.getReserved(), FIELD_NOT_AVAILABLE_32_BIT);
 
 
-    // // For OABR Type
-    // decoder.setInstructionWord((0x39 << 26));
-    // EXPECT_EQ(decoder.getReserved(), FIELD_NOT_AVAILABLE_32_BIT);
+    // For DABROO Type
+    // 0x0A
+    // getOp2() >= 0b1100 && getOp2() >= 0b1111
+    decoder.setInstructionWord((0x0A << 26) | 0b11000000 | BITS_25_8 | BITS_3_0);
+    EXPECT_EQ(decoder.getReserved(), 0x3FFFFF);
+    // anything smaller than 0b 0111 1111
+    decoder.setInstructionWord((0x0A << 26) | 0b01000000 | BITS_10_8);
+    EXPECT_EQ(decoder.getReserved(), 0x7);
+
+    // For DABROO Type
+    // 0x32
+    decoder.setInstructionWord((0x32 << 26) | 0b00001000 | BITS_25_21 | BITS_10_8);
+    EXPECT_EQ(decoder.getReserved(), 0xFF);
+    decoder.setInstructionWord((0x32 << 26) | 0b00101000 | BITS_25_21 | BITS_10_8);
+    EXPECT_EQ(decoder.getReserved(), 0xFF);
+    decoder.setInstructionWord((0x32 << 26) | 0b00011000 | BITS_25_21 | BITS_10);
+    EXPECT_EQ(decoder.getReserved(), 0x3F);
+    decoder.setInstructionWord((0x32 << 26) | 0b00111000 | BITS_25_21 | BITS_10);
+    EXPECT_EQ(decoder.getReserved(), 0x3F);
+    decoder.setInstructionWord((0x32 << 26) | 0b00110100 | BITS_25_21 | BITS_9_8);
+    EXPECT_EQ(decoder.getReserved(), 0x7F);
+    decoder.setInstructionWord((0x32 << 26) | 0b00110101 | BITS_25_21 | BITS_10 | BITS_8);
+    EXPECT_EQ(decoder.getReserved(), 0x7F);
+    // decoder.setInstructionWord((0x32 << 26) |  | BITS_25_21 | BITS_3_0);
+    // EXPECT_EQ(decoder.getReserved(), 0xFF);
+    // decoder.setInstructionWord((0x32 << 26) |  | BITS_10_8);
+    // EXPECT_EQ(decoder.getReserved(), 0x7);
+    // decoder.setInstructionWord((0x32 << 26) |  | BITS_8);
+    // EXPECT_EQ(decoder.getReserved(), 0x1);
+
+
+
+    // For RBR Type
+    uint8_t rbr_opcodes[] = {0x11, 0x12};
+    for (auto op : rbr_opcodes) {
+        decoder.setInstructionWord((op << 26) | BITS_25_16 | BITS_10_0);
+        EXPECT_EQ(decoder.getReserved(), 0x1FFFFF);
+    }
+
+    // For RAI Type
+    decoder.setInstructionWord((0x13 << 26) | BITS_25_21);
+    EXPECT_EQ(decoder.getReserved(), 0x1F);
+
+    // For RABRO Type
+    decoder.setInstructionWord((0x31 << 26) | BITS_25_21 | BITS_10_4);
+    EXPECT_EQ(decoder.getReserved(), 0xFFF);
+
+
+    // For OABR Type
+    decoder.setInstructionWord((0x39 << 26) | BITS_10_0);
+    EXPECT_EQ(decoder.getReserved(), 0x7FF);
 
 
     ///////////////////// types that DO NOT have the Immedate N field /////////////////////
