@@ -21,6 +21,71 @@ operator<<(std::ostream &os, const InstructionDecoder &decoder)
    */
   os << "not implemented";
 
+  switch (decoder.getInstructionType()) {
+    case INVALID:
+      os << "invalid opcode"
+      break;
+    case R:
+      break;
+    case I:
+      switch(decoder.getOpcode()) {
+        
+      }
+      break;
+    case S:
+      switch(decoder.getOpcode()) {
+        
+      }
+      break;
+    case SH:
+      break;
+    case J:
+      switch(decoder.getOpcode()) {
+
+      }
+      break;
+    case F:
+      break;
+    case DN:
+      break;
+    case ORK:
+      break;
+    case DROK:
+      break;
+    case OK:
+      break;
+    case RES:
+      switch(decoder.getOpcode()) {
+        
+      }
+      break;
+    case DABROO:
+      switch(decoder.getOpcode()) {
+        
+      }
+      break;
+    case RBR:
+      switch(decoder.getOpcode()) {
+        
+      }
+      break;
+    case RAI:
+      break;
+    case DAK:
+      switch(decoder.getOpcode()) {
+        
+      }
+      break;
+    case KABK:
+      break;
+    case RABRO:
+      break;
+    case OABR:
+      break;
+    case DABLK:
+      break;
+  }
+
   return os;
 }
 

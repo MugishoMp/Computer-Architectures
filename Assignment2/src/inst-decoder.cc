@@ -424,6 +424,7 @@ InstructionDecoder::getL() const
       break;
     case DABLK:
       L = (getInstructionWord() & BITS_10_5) >> 5; // Right shift by 8 bits
+      break;
     default:
       L = FIELD_NOT_AVAILABLE_8_BIT;
   }
@@ -472,7 +473,7 @@ InstructionDecoder::getO() const
       if((getOp2() >= 0b00011000 && getOp2() <= 0b00011101) || (getOp2() >= 0b111000 && getOp2() <= 0b111110))
         O = (getInstructionWord() & BITS_9_8) >> 8; // Right shift by 8 bits
       else if(getOp2() == 0b00010100 || getOp2() == 0b00010101)
-        O = (getInstructionWord() & BITS_10_9) >> 8; // Right shift by 8 bits
+        O = (getInstructionWord() & BITS_10_9) >> 9; // Right shift by 8 bits
       else if(getOp2() == 0b1101 || getOp2() == 0b1110)
         O = (getInstructionWord() & BITS_10_8) >> 8; // Right shift by 8 bits
       else if(getOp2() >= 0b00010000 && getOp2() <= 0b00010111)

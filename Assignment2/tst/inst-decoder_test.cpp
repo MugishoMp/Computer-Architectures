@@ -778,7 +778,7 @@ TEST(InstructionDecoderTest, GetImmediateNShouldReturnCorrectValue) {
 // Add unit tests for getReserved() function
 TEST(InstructionDecoderTest, GetReservedShouldReturnCorrectValue) {
     InstructionDecoder decoder;
-    ///////////////////// types that DO have the Immedate N field /////////////////////
+    ///////////////////// types that DO have the Reserved field /////////////////////
 
     // For R Type
     decoder.setInstructionWord((0x38 << 26) | BITS_10 | BITS_7_4);
@@ -871,7 +871,7 @@ TEST(InstructionDecoderTest, GetReservedShouldReturnCorrectValue) {
     EXPECT_EQ(decoder.getReserved(), 0x7FF);
 
 
-    ///////////////////// types that DO NOT have the Immedate N field /////////////////////
+    ///////////////////// types that DO NOT have the Reserved field /////////////////////
     // For J Type
     uint8_t j_opcodes[] = {0x00, 0x01, 0x03, 0x04};
     for (auto op : j_opcodes) {
@@ -926,19 +926,341 @@ TEST(InstructionDecoderTest, GetReservedShouldReturnCorrectValue) {
 TEST(InstructionDecoderTest, GetLShouldReturnCorrectValue) {
     InstructionDecoder decoder;
 
-    // Add your test cases here
+    ///////////////////// types that DO have the L field /////////////////////
+    // For SH Type
+    decoder.setInstructionWord((0x2E << 26) | BITS_5_0);
+    EXPECT_EQ(decoder.getL(), 0x3F);
+
+    // For DABLK Type
+    decoder.setInstructionWord((0x3C << 26) | BITS_10_5);
+    EXPECT_EQ(decoder.getL(), 0x3F);
+
+    ///////////////////// types that DO NOT have the L field /////////////////////
+    // For J Type
+    uint8_t j_opcodes[] = {0x00, 0x01, 0x03, 0x04};
+    for (auto op : j_opcodes) {
+        decoder.setInstructionWord((op << 26) | BITS_25_0);
+        EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+    }
+
+    // For DN Type
+    decoder.setInstructionWord((0x02 << 26) | BITS_20_0);
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For I Type
+    uint8_t i_opcodes[] = {0x1A, 0x1B, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x2B, 0x2C};
+    for (auto op : i_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+    }
+
+    // For F Type
+    decoder.setInstructionWord(0x2F << 26);
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For RAI Type
+    decoder.setInstructionWord(0x13 << 26);
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For S Type
+    uint8_t s_opcodes[] = {0x33, 0x35, 0x36, 0x37};
+    for (auto op : s_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+    }
+
+    
+    // For DROK Type
+    decoder.setInstructionWord(0x06 << 26);
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For DABROO Type
+    uint8_t dabroo_opcodes[] = {0x0A, 0x32};
+    for (auto op : dabroo_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+    }
+
+    // For DAK Type
+    uint8_t dak_opcodes[] = {0x29, 0x2A, 0x2D};
+    for (auto op : dak_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+    }
+
+    // For R Type
+    decoder.setInstructionWord(0x38 << 26);
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+
+
+    // For ORK Type
+    decoder.setInstructionWord(0x05 << 26);
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For OK Type
+    decoder.setInstructionWord(0x08 << 26);
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For RES Type
+    uint8_t res_opcodes[] = {0x09, 0x1C, 0x1D, 0x1E, 0x1F, 0x3D, 0x3E, 0x3F};
+    for (auto op : res_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+    }
+
+    // For RBR Type
+    uint8_t rbr_opcodes[] = {0x11, 0x12};
+    for (auto op : rbr_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+    }
+
+    // For KABK Type
+    decoder.setInstructionWord(0x30 << 26);
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For RABRO Type
+    decoder.setInstructionWord(0x31 << 26);
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For OABR Type
+    decoder.setInstructionWord(0x39 << 26);
+    EXPECT_EQ(decoder.getL(), FIELD_NOT_AVAILABLE_8_BIT);
 }
 
 // Add unit tests for getK() function
 TEST(InstructionDecoderTest, GetKShouldReturnCorrectValue) {
     InstructionDecoder decoder;
 
-    // Add your test cases here
+    ///////////////////// types that DO have the K field /////////////////////
+    // For DABLK Type
+    decoder.setInstructionWord((0x3C << 26) | BITS_5_0);
+    EXPECT_EQ(decoder.getK(), 0x3F);
+
+    // For ORK Type
+    decoder.setInstructionWord((0x05 << 26) | BITS_15_0);
+    EXPECT_EQ(decoder.getK(), 0xFFFF);
+
+    // For DROK Type
+    decoder.setInstructionWord((0x06 << 26) | BITS_15_0);
+    EXPECT_EQ(decoder.getK(), 0xFFFF);
+
+    // For OK Type
+    decoder.setInstructionWord((0x08 << 26) | BITS_15_0);
+    EXPECT_EQ(decoder.getK(), 0xFFFF);
+
+    // For DAK Type
+    uint8_t dak_opcodes[] = {0x29, 0x2A, 0x2D};
+    for (auto op : dak_opcodes) {
+        decoder.setInstructionWord((op << 26) | BITS_15_0);
+        EXPECT_EQ(decoder.getK(), 0xFFFF);
+    }
+    
+    // For KABK Type
+    decoder.setInstructionWord((0x30 << 26) | BITS_25_21 | BITS_10_0);
+    EXPECT_EQ(decoder.getK(), 0xFFFF);
+
+
+
+    ///////////////////// types that DO NOT have the K field /////////////////////
+    // For SH Type
+    decoder.setInstructionWord((0x2E << 26) | BITS_5_0);
+    EXPECT_EQ(decoder.getK(), FIELD_NOT_AVAILABLE_32_BIT);
+
+
+    // For J Type
+    uint8_t j_opcodes[] = {0x00, 0x01, 0x03, 0x04};
+    for (auto op : j_opcodes) {
+        decoder.setInstructionWord((op << 26) | BITS_25_0);
+        EXPECT_EQ(decoder.getK(), FIELD_NOT_AVAILABLE_32_BIT);
+    }
+
+    // For DN Type
+    decoder.setInstructionWord((0x02 << 26) | BITS_20_0);
+    EXPECT_EQ(decoder.getK(), FIELD_NOT_AVAILABLE_32_BIT);
+
+    // For I Type
+    uint8_t i_opcodes[] = {0x1A, 0x1B, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x2B, 0x2C};
+    for (auto op : i_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getK(), FIELD_NOT_AVAILABLE_32_BIT);
+    }
+
+    // For F Type
+    decoder.setInstructionWord(0x2F << 26);
+    EXPECT_EQ(decoder.getK(), FIELD_NOT_AVAILABLE_32_BIT);
+
+    // For RAI Type
+    decoder.setInstructionWord(0x13 << 26);
+    EXPECT_EQ(decoder.getK(), FIELD_NOT_AVAILABLE_32_BIT);
+
+    // For S Type
+    uint8_t s_opcodes[] = {0x33, 0x35, 0x36, 0x37};
+    for (auto op : s_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getK(), FIELD_NOT_AVAILABLE_32_BIT);
+    }
+
+    // For DABROO Type
+    uint8_t dabroo_opcodes[] = {0x0A, 0x32};
+    for (auto op : dabroo_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getK(), FIELD_NOT_AVAILABLE_32_BIT);
+    }
+
+    // For R Type
+    decoder.setInstructionWord(0x38 << 26);
+    EXPECT_EQ(decoder.getK(), FIELD_NOT_AVAILABLE_32_BIT);
+
+    // For RES Type
+    uint8_t res_opcodes[] = {0x09, 0x1C, 0x1D, 0x1E, 0x1F, 0x3D, 0x3E, 0x3F};
+    for (auto op : res_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getK(), FIELD_NOT_AVAILABLE_32_BIT);
+    }
+
+    // For RBR Type
+    uint8_t rbr_opcodes[] = {0x11, 0x12};
+    for (auto op : rbr_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getK(), FIELD_NOT_AVAILABLE_32_BIT);
+    }
+
+    // For RABRO Type
+    decoder.setInstructionWord(0x31 << 26);
+    EXPECT_EQ(decoder.getK(), FIELD_NOT_AVAILABLE_32_BIT);
+
+    // For OABR Type
+    decoder.setInstructionWord(0x39 << 26);
+    EXPECT_EQ(decoder.getK(), FIELD_NOT_AVAILABLE_32_BIT);
 }
 
 // Add unit tests for getO() function
 TEST(InstructionDecoderTest, GetOShouldReturnCorrectValue) {
     InstructionDecoder decoder;
 
-    // Add your test cases here
+    ///////////////////// types that DO have the L field /////////////////////
+    // For DABROO Type
+    decoder.setInstructionWord(0x32 << 26 | 0b00110100 | BITS_10);
+    EXPECT_EQ(decoder.getO(), 0x1);
+    decoder.setInstructionWord(0x32 << 26 | 0b00110101 | BITS_9);
+    EXPECT_EQ(decoder.getO(), 0x1);
+    
+    decoder.setInstructionWord(0x32 << 26 | 0b00011000 | BITS_9_8);
+    EXPECT_EQ(decoder.getO(), 0x3);
+    decoder.setInstructionWord(0x32 << 26 | 0b111000 | BITS_9_8);
+    EXPECT_EQ(decoder.getO(), 0x3);
+    // and more . . .
+
+    decoder.setInstructionWord(0x32 << 26 | 0b00010100 | BITS_10_9);
+    EXPECT_EQ(decoder.getO(), 0x3);
+    decoder.setInstructionWord(0x32 << 26 | 0b00010101 | BITS_10_9);
+    EXPECT_EQ(decoder.getO(), 0x3);
+
+    decoder.setInstructionWord(0x32 << 26 | 0b1101| BITS_10_8);
+    EXPECT_EQ(decoder.getO(), 0x7);
+    decoder.setInstructionWord(0x32 << 26 | 0b1110| BITS_10_8);
+    EXPECT_EQ(decoder.getO(), 0x7);
+
+    decoder.setInstructionWord(0x32 << 26 | 0b00010000 | BITS_10_8);
+    EXPECT_EQ(decoder.getO(), 0x7);
+    // and more . . .
+
+
+    ///////////////////// types that DO NOT have the L field /////////////////////
+    // For DABROO Type
+    decoder.setInstructionWord(0x0A << 26);
+    EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For SH Type
+    decoder.setInstructionWord((0x2E << 26) | BITS_5_0);
+    EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For DABLK Type
+    decoder.setInstructionWord((0x3C << 26) | BITS_10_5);
+    EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For J Type
+    uint8_t j_opcodes[] = {0x00, 0x01, 0x03, 0x04};
+    for (auto op : j_opcodes) {
+        decoder.setInstructionWord((op << 26) | BITS_25_0);
+        EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+    }
+
+    // For DN Type
+    decoder.setInstructionWord((0x02 << 26) | BITS_20_0);
+    EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For I Type
+    uint8_t i_opcodes[] = {0x1A, 0x1B, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x2B, 0x2C};
+    for (auto op : i_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+    }
+
+    // For F Type
+    decoder.setInstructionWord(0x2F << 26);
+    EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For RAI Type
+    decoder.setInstructionWord(0x13 << 26);
+    EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For S Type
+    uint8_t s_opcodes[] = {0x33, 0x35, 0x36, 0x37};
+    for (auto op : s_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+    }
+
+    
+    // For DROK Type
+    decoder.setInstructionWord(0x06 << 26);
+    EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For DAK Type
+    uint8_t dak_opcodes[] = {0x29, 0x2A, 0x2D};
+    for (auto op : dak_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+    }
+
+    // For R Type
+    decoder.setInstructionWord(0x38 << 26);
+    EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+
+
+    // For ORK Type
+    decoder.setInstructionWord(0x05 << 26);
+    EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For OK Type
+    decoder.setInstructionWord(0x08 << 26);
+    EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For RES Type
+    uint8_t res_opcodes[] = {0x09, 0x1C, 0x1D, 0x1E, 0x1F, 0x3D, 0x3E, 0x3F};
+    for (auto op : res_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+    }
+
+    // For RBR Type
+    uint8_t rbr_opcodes[] = {0x11, 0x12};
+    for (auto op : rbr_opcodes) {
+        decoder.setInstructionWord(op << 26);
+        EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+    }
+
+    // For KABK Type
+    decoder.setInstructionWord(0x30 << 26);
+    EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For RABRO Type
+    decoder.setInstructionWord(0x31 << 26);
+    EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
+
+    // For OABR Type
+    decoder.setInstructionWord(0x39 << 26);
+    EXPECT_EQ(decoder.getO(), FIELD_NOT_AVAILABLE_8_BIT);
 }
