@@ -375,9 +375,9 @@ InstructionDecoder::getReserved() const
         else
           reserved = (getInstructionWord() & BITS_10_8) >> 8; // Right shift by 8 bits
       } else if (getOpcode() == 0x32) {
-        if((getOp2() >= 0b1000 && getOp2() <= 0b1101) || (getOp2() >= 0b00101000 && getOp2() <= 0b00110101))
+        if((getOp2() >= 0b1000 && getOp2() <= 0b1101) || (getOp2() >= 0b00101000 && getOp2() <= 0b00101110))
           reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 3) | ((getInstructionWord() & BITS_10_8) >> 0);
-        else if((getOp2() >= 0b00011000 && getOp2() <= 0b00011101) || (getOp2() >= 0b1110000 && getOp2() <= 0b111110))
+        else if((getOp2() >= 0b00011000 && getOp2() <= 0b00011101) || (getOp2() >= 0b111000 && getOp2() <= 0b00111110))
           reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 5) | ((getInstructionWord() & BITS_10) >> 0);
         else if(getOp2() >= 0b0000 && getOp2() <= 0b00110100)
           reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 5) | ((getInstructionWord() & BITS_9_8) >> 0);
@@ -455,18 +455,29 @@ InstructionDecoder::getK() const
 }
 
 
-// uint8_t
-// InstructionDecoder::getO() const
-// {
-//   uint8_t O = 0;
+uint8_t
+InstructionDecoder::getO() const
+{
+  uint8_t O = FIELD_NOT_AVAILABLE_8_BIT;
 
-//   switch (getInstructionType()) {
-//     case SH:
-//       O = (getInstructionWord() & BITS_5_0) >> 0; // Right shift by 8 bits
-//       break;
-//     default:
-//       O = FIELD_NOT_AVAILABLE_8_BIT;
-//   }
+  switch (getOpcode()) {
+    case 0x32:
+      if(getOp2() == 0b00110100)
+        O = (getInstructionWord() & BITS_10) >> 10; // Right shift by 8 bits
+      else if(getOp2() == 0b00110101)
+        O = (getInstructionWord() & BITS_9) >> 9; // Right shift by 8 bits
+      if((getOp2() >= 0b00011000 && getOp2() <= 0b00011101) || (getOp2() >= 0b111000 && getOp2() <= 0b111110))
+        O = (getInstructionWord() & BITS_9_8) >> 8; // Right shift by 8 bits
+      else if(getOp2() == 0b00010100 || getOp2() == 0b00010101)
+        O = (getInstructionWord() & BITS_10_9) >> 8; // Right shift by 8 bits
+      else if(getOp2() == 0b1101 || getOp2() == 0b1110)
+        O = (getInstructionWord() & BITS_10_8) >> 8; // Right shift by 8 bits
+      else if(getOp2() >= 0b00010000 && getOp2() <= 0b00010111)
+        O = (getInstructionWord() & BITS_10_8) >> 8; // Right shift by 8 bits
+      break;
+    default:
+      O = FIELD_NOT_AVAILABLE_8_BIT;
+  }
 
-//   return O;  /* result undefined */
-// }
+  return O;  /* result undefined */
+}

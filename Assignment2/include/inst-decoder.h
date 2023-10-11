@@ -36,8 +36,10 @@ static const int INSTRUCTION_SIZE = 4;
 #define BITS_10_4  0x000007F0   // Represents 00000000 00000000 00000111 11110000
 #define BITS_10_5  0x000007E0   // Represents 00000000 00000000 00000111 11100000
 #define BITS_10_8  0x00000700   // Represents 00000000 00000000 00000111 00000000
+#define BITS_10_9  0x00000600   // Represents 00000000 00000000 00000110 00000000
 #define BITS_10    0x00000400   // Represents 00000000 00000000 00000100 00000000
 #define BITS_9_8   0x00000300   // Represents 00000000 00000000 00000011 00000000
+#define BITS_9     0x00000200   // Represents 00000000 00000000 00000010 00000000
 #define BITS_8     0x00000100   // Represents 00000000 00000000 00000001 00000000
 #define BITS_7_6   0x000000C0   // Represents 00000000 00000000 00000000 11000000
 #define BITS_7_4   0x000000F0   // Represents 00000000 00000000 00000000 11110000
@@ -220,12 +222,12 @@ class InstructionDecoder
      */
     uint32_t getK() const;
 
-    // /**
-    //  * @brief 
-    //  * 
-    //  * @return uint8_t 
-    //  */ */
-    // uint8_t getO() const;
+    /**
+     * @brief 
+     * 
+     * @return uint8_t 
+     */ 
+    uint8_t getO() const;
 
   private:
     uint32_t instructionWord;
