@@ -184,7 +184,11 @@ TEST(InstructionDecoderTest, GetOp2ShouldReturnCorrectValue) {
     for (auto op : dabroo_opcodes) {
         decoder.setInstructionWord((op << 26) | 0b11011111);
         EXPECT_EQ(decoder.getOp2(), 0b1101);
+        decoder.setInstructionWord((op << 26) | 0b11010000);
+        EXPECT_EQ(decoder.getOp2(), 0b1101);
         decoder.setInstructionWord((op << 26) | 0b11101111);
+        EXPECT_EQ(decoder.getOp2(), 0b1110);
+        decoder.setInstructionWord((op << 26) | 0b11100000);
         EXPECT_EQ(decoder.getOp2(), 0b1110);
         if (op == 0x0A) {
             decoder.setInstructionWord((op << 26) | 0b11001111);
@@ -803,10 +807,9 @@ TEST(InstructionDecoderTest, GetReservedShouldReturnCorrectValue) {
 
     // For DABROO Type
     // 0x0A
-    // getOp2() >= 0b1100 && getOp2() >= 0b1111
     decoder.setInstructionWord((0x0A << 26) | 0b11000000 | BITS_25_8 | BITS_3_0);
     EXPECT_EQ(decoder.getReserved(), 0x3FFFFF);
-    // anything smaller than 0b 0111 1111
+    // and more . . .
     decoder.setInstructionWord((0x0A << 26) | 0b01000000 | BITS_10_8);
     EXPECT_EQ(decoder.getReserved(), 0x7);
 
@@ -816,20 +819,34 @@ TEST(InstructionDecoderTest, GetReservedShouldReturnCorrectValue) {
     EXPECT_EQ(decoder.getReserved(), 0xFF);
     decoder.setInstructionWord((0x32 << 26) | 0b00101000 | BITS_25_21 | BITS_10_8);
     EXPECT_EQ(decoder.getReserved(), 0xFF);
+    // and more . . .
+
     decoder.setInstructionWord((0x32 << 26) | 0b00011000 | BITS_25_21 | BITS_10);
     EXPECT_EQ(decoder.getReserved(), 0x3F);
     decoder.setInstructionWord((0x32 << 26) | 0b00111000 | BITS_25_21 | BITS_10);
     EXPECT_EQ(decoder.getReserved(), 0x3F);
+    // and more . . .
+
     decoder.setInstructionWord((0x32 << 26) | 0b00110100 | BITS_25_21 | BITS_9_8);
     EXPECT_EQ(decoder.getReserved(), 0x7F);
+
     decoder.setInstructionWord((0x32 << 26) | 0b00110101 | BITS_25_21 | BITS_10 | BITS_8);
     EXPECT_EQ(decoder.getReserved(), 0x7F);
-    // decoder.setInstructionWord((0x32 << 26) |  | BITS_25_21 | BITS_3_0);
-    // EXPECT_EQ(decoder.getReserved(), 0xFF);
-    // decoder.setInstructionWord((0x32 << 26) |  | BITS_10_8);
-    // EXPECT_EQ(decoder.getReserved(), 0x7);
-    // decoder.setInstructionWord((0x32 << 26) |  | BITS_8);
-    // EXPECT_EQ(decoder.getReserved(), 0x1);
+
+
+    decoder.setInstructionWord((0x32 << 26) | 0b11010000 | BITS_25_21 | BITS_3_0);
+    EXPECT_EQ(decoder.getReserved(), 0x1FF);
+    decoder.setInstructionWord((0x32 << 26) | 0b11100000 | BITS_25_21 | BITS_3_0);
+    EXPECT_EQ(decoder.getReserved(), 0x1FF);
+
+    decoder.setInstructionWord((0x32 << 26) | 0b00000000 | BITS_10_8);
+    EXPECT_EQ(decoder.getReserved(), 0x7);
+    // and more . . .
+
+    decoder.setInstructionWord((0x32 << 26) | 0b00010101 | BITS_8);
+    EXPECT_EQ(decoder.getReserved(), 0x1);
+    decoder.setInstructionWord((0x32 << 26) | 0b00010100 | BITS_8);
+    EXPECT_EQ(decoder.getReserved(), 0x1);
 
 
 

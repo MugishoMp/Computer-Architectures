@@ -377,17 +377,18 @@ InstructionDecoder::getReserved() const
         else
           reserved = (getInstructionWord() & BITS_10_8) >> 8; // Right shift by 8 bits
       } else if (getOpcode() == 0x32) {
-        if((getOp2() >= 0b1000 && getOp2() <= 0b1101) || (getOp2() >= 0b00101000 && getOp2() <= 0b00101110))
+        if((getOp2() >= 0b1000 && getOp2() <= 0b1101 && (((getInstructionWord() >> 7) & 0b1) == 0)) || (getOp2() >= 0b00101000 && getOp2() <= 0b00101110))
           reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 3) | ((getInstructionWord() & BITS_10_8) >> 8);
         else if((getOp2() >= 0b00011000 && getOp2() <= 0b00011101) || (getOp2() >= 0b111000 && getOp2() <= 0b00111110))
           reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 1) | ((getInstructionWord() & BITS_10) >> 10);
-        else if(getOp2() >= 0b0000 && getOp2() <= 0b00110100)
+        else if(getOp2() == 0b00110100)
           reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 2) | ((getInstructionWord() & BITS_9_8) >> 8);
         else if(getOp2() == 0b00110101)
-          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 2) | ((getInstructionWord() & BITS_10) >> 10)  << 1| ((getInstructionWord() & BITS_8) >> 8);
+          reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 2) | ((getInstructionWord() & BITS_10) >> 10)  << 1 | ((getInstructionWord() & BITS_8) >> 8);
         else if(getOp2() == 0b1101 || getOp2() == 0b1110)
           reserved = (((getInstructionWord() & BITS_25_21) >> 21) << 4) | ((getInstructionWord() & BITS_3_0) >> 0);
-        else if(getOp2() >= 0b0000 && getOp2() <= 0b0111)
+        
+        else if(getOp2() >= 0b00000000 && getOp2() <= 0b00000111)
           reserved = (getInstructionWord() & BITS_10_8) >> 8; // Right shift by 8 bits
         else if(getOp2() == 0b00010101 || getOp2() == 0b00010100)
           reserved = (getInstructionWord() & BITS_8) >> 8; // Right shift by 8 bits
