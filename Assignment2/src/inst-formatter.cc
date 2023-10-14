@@ -112,7 +112,7 @@ void printSTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
       os << "l.sh" << " ";
       break;
   }
-  os << int16_t(decoder.getImmediateI()) << "(" << "r" << int(decoder.getA()) << ")" << ", ";
+  os << decoder.getImmediateI() << "(" << "r" << int(decoder.getA()) << ")" << ", ";
   os << "r" << int(decoder.getB()) << " ";
 }
 void printRABROTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
@@ -169,7 +169,7 @@ void printJTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
       os << "l.bf" << " ";
       break;
   }
-  os << decoder.getImmediateN() << " ";
+  os << uint_(decoder.getImmediateN()) << " ";
 }
 void printOKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x08

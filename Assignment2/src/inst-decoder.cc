@@ -304,6 +304,7 @@ InstructionDecoder::getD() const
   return D;  /* result undefined */
 }
 
+// can be a negative number
 int16_t
 InstructionDecoder::getImmediateI() const
 {
@@ -318,7 +319,8 @@ InstructionDecoder::getImmediateI() const
     case S:
       // we need to sign extend this field because here we are trying to fit 
       // a smaller SIGNED number in a bigger "container"!
-      immediateI = ((getInstructionWord() & BITS_10_0) >> 0) | ; // Right shift by 8 bits
+      immediateI = (getInstructionWord() & BITS_10_0) >> 0; // Right shift by 8 bits
+      if (immediateI >> 10 & 0b1) immediateI = immediateI | (0b11111 << 11);
       break;
     default:
       immediateI = FIELD_NOT_AVAILABLE_16_BIT;
@@ -327,6 +329,7 @@ InstructionDecoder::getImmediateI() const
   return immediateI;  /* result undefined */
 }
 
+// can be a negative number
 int32_t
 InstructionDecoder::getImmediateN() const
 {
@@ -335,9 +338,11 @@ InstructionDecoder::getImmediateN() const
   switch (getInstructionType()) {
     case J:
       immediateN = (getInstructionWord() & BITS_25_0) >> 0; // Right shift by 8 bits
+      if (immediateN >> 25 & 0b1) immediateN = immediateN | (0b111111 << 26);
       break;
     case DN:
       immediateN = (getInstructionWord() & BITS_20_0) >> 0; // Right shift by 8 bits
+      if (immediateN >> 20 & 0b1) immediateN = immediateN | (0b11111111111 << 21);
       break;
     default:
       immediateN = FIELD_NOT_AVAILABLE_32_BIT;
