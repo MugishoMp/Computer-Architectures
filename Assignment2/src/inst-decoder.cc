@@ -10,6 +10,8 @@
 
 #include <map>
 
+#include<iostream>
+
 /*
  * Class InstructionDecoder -- helper class for getting specific
  * information from the decoded instruction.
@@ -27,13 +29,7 @@ InstructionDecoder::getInstructionWord() const
   return instructionWord;
 }
 
-// void
-// InstructionDecoder::setInstructionType(const Type instructionType) 
-// {
-//   this->instructionType = instructionType;
-// }
-
-
+// TODO: create helper function
 InstructionType
 InstructionDecoder::getInstructionType() const
 {
@@ -305,14 +301,13 @@ InstructionDecoder::getD() const
     default:
       D = FIELD_NOT_AVAILABLE_8_BIT;
   }
-
   return D;  /* result undefined */
 }
 
-uint16_t
+int16_t
 InstructionDecoder::getImmediateI() const
 {
-  uint16_t immediateI = FIELD_NOT_AVAILABLE_16_BIT;
+  int16_t immediateI = FIELD_NOT_AVAILABLE_16_BIT;
 
   switch (getInstructionType()) {
     case I:
@@ -321,7 +316,9 @@ InstructionDecoder::getImmediateI() const
       immediateI = (getInstructionWord() & BITS_15_0) >> 0; // Right shift by 8 bits
       break;
     case S:
-      immediateI = (getInstructionWord() & BITS_10_0) >> 0; // Right shift by 8 bits
+      // we need to sign extend this field because here we are trying to fit 
+      // a smaller SIGNED number in a bigger "container"!
+      immediateI = ((getInstructionWord() & BITS_10_0) >> 0) | ; // Right shift by 8 bits
       break;
     default:
       immediateI = FIELD_NOT_AVAILABLE_16_BIT;
@@ -330,10 +327,10 @@ InstructionDecoder::getImmediateI() const
   return immediateI;  /* result undefined */
 }
 
-uint32_t
+int32_t
 InstructionDecoder::getImmediateN() const
 {
-  uint32_t immediateN = FIELD_NOT_AVAILABLE_32_BIT;
+  int32_t immediateN = FIELD_NOT_AVAILABLE_32_BIT;
 
   switch (getInstructionType()) {
     case J:
@@ -349,10 +346,11 @@ InstructionDecoder::getImmediateN() const
   return immediateN;  /* result undefined */
 }
 
-uint32_t
+// TODO: create helper function
+int32_t
 InstructionDecoder::getReserved() const
 {
-  uint32_t reserved = FIELD_NOT_AVAILABLE_32_BIT;
+  int32_t reserved = FIELD_NOT_AVAILABLE_32_BIT;
 
   switch (getInstructionType()) {
     case R:
@@ -413,10 +411,10 @@ InstructionDecoder::getReserved() const
   return reserved;  /* result undefined */
 }
 
-uint8_t
+int8_t
 InstructionDecoder::getL() const
 {
-  uint8_t L = FIELD_NOT_AVAILABLE_8_BIT;
+  int8_t L = FIELD_NOT_AVAILABLE_8_BIT;
 
   switch (getInstructionType()) {
     case SH:
@@ -433,10 +431,10 @@ InstructionDecoder::getL() const
 }
 
 
-uint32_t
+int32_t
 InstructionDecoder::getK() const
 {
-  uint32_t K = FIELD_NOT_AVAILABLE_32_BIT;
+  int32_t K = FIELD_NOT_AVAILABLE_32_BIT;
 
   switch (getInstructionType()) {
     case DABLK:
@@ -459,10 +457,10 @@ InstructionDecoder::getK() const
 }
 
 
-uint8_t
+int8_t
 InstructionDecoder::getO() const
 {
-  uint8_t O = FIELD_NOT_AVAILABLE_8_BIT;
+  int8_t O = FIELD_NOT_AVAILABLE_8_BIT;
 
   switch (getOpcode()) {
     case 0x32:

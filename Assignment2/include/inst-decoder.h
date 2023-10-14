@@ -46,9 +46,9 @@ static const int INSTRUCTION_SIZE = 4;
 #define BITS_7_0   0x000000FF   // Represents 00000000 00000000 00000000 11111111
 #define BITS_5_0   0x0000003F   // Represents 00000000 00000000 00000000 00111111
 #define BITS_3_0   0x0000000F   // Represents 00000000 00000000 00000000 00001111
-#define FIELD_NOT_AVAILABLE_8_BIT 255     // Value outside the range of valid values for 8-bit.
-#define FIELD_NOT_AVAILABLE_16_BIT 65535  // Value outside the range of valid values for 16-bit.
-#define FIELD_NOT_AVAILABLE_32_BIT 4294967295  // Value outside the range of valid values for 32-bit.
+#define FIELD_NOT_AVAILABLE_8_BIT 0x4     // Value outside the range of valid values for 8-bit.
+#define FIELD_NOT_AVAILABLE_16_BIT 0x44  // Value outside the range of valid values for 16-bit.
+#define FIELD_NOT_AVAILABLE_32_BIT 0x4444  // Value outside the range of valid values for 32-bit.
 
 enum InstructionType {
   INVALID,
@@ -149,13 +149,13 @@ class InstructionDecoder
      */
     uint8_t getOp3() const;
 
-    /**
-     * Get FunctionCode of the instruction.
-     * @brief gets the bits at the bit positions
-     * in the case of a R type instruction
-     * @return The FunctionCode.
-     */
-    uint8_t getFunctionCode() const;
+    // /**
+    //  * Get FunctionCode of the instruction.
+    //  * @brief gets the bits at the bit positions
+    //  * in the case of a R type instruction
+    //  * @return The FunctionCode.
+    //  */
+    // uint8_t getFunctionCode() const;
     
     /**
      * Get the value of register A.
@@ -188,7 +188,7 @@ class InstructionDecoder
      * 10-0 in the case of an S type instruction
      * @return The immediate value I.
      */
-    uint16_t getImmediateI() const;
+    int16_t getImmediateI() const;
 
     /**
      * Get the immediate value.
@@ -196,7 +196,7 @@ class InstructionDecoder
      * in the case of a J type instruction 
      * @return The immediate N.
      */
-    uint32_t getImmediateN() const;
+    int32_t getImmediateN() const;
 
     /**
      * Get the reserved field of the instruction.
@@ -205,7 +205,7 @@ class InstructionDecoder
      * 15-8 in the case of an S type instruction
      * @return The reserved field.
      */
-    uint32_t getReserved() const;
+    int32_t getReserved() const;
 
     /**
      * Get the L field of the instruction.
@@ -213,21 +213,21 @@ class InstructionDecoder
      * in the case of a SH type instruction
      * @return The L field.
      */
-    uint8_t getL() const;
+    int8_t getL() const;
 
     /**
      * @brief 
      * 
      * @return uint32_t 
      */
-    uint32_t getK() const;
+    int32_t getK() const;
 
     /**
      * @brief 
      * 
      * @return uint8_t 
      */ 
-    uint8_t getO() const;
+    int8_t getO() const;
 
   private:
     uint32_t instructionWord;

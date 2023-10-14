@@ -12,6 +12,438 @@
 #include <iostream>
 
 
+void printDNTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  // 0x02
+  os << "l.adrp" << " ";
+  os << "r" << int(decoder.getD()) << ", ";
+  os << int(decoder.getImmediateI()) << " ";
+}
+void printORKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  // 0x05
+  os << "l.nop" << " ";
+  os << int(decoder.getK()) << " ";
+}
+void printRAITypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  // 0x13
+  os << "l.maci" << " ";
+  os << "r" << int(decoder.getA()) << ", ";
+  os << int(decoder.getImmediateI()) << " ";
+}
+void printKABKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  // 0x30
+  os << "l.mtspr" << " ";
+  os << "r" << int(decoder.getA()) << ", ";
+  os << "r" << int(decoder.getB()) << ", ";
+  os << int(decoder.getK()) << " ";
+}
+void printDABLKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  // 0x3C
+  os << "l.cust5" << " ";
+  os << "r" << int(decoder.getD()) << ", ";
+  os << "r" << int(decoder.getA()) << ", ";
+  os << "r" << int(decoder.getA()) << ", ";
+  os << int(decoder.getL()) << ", ";
+  os << int(decoder.getK()) << " ";
+}
+void printDROKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  // 0x06
+  if (decoder.getOp2())
+    os << "l.macrc" << " ";
+  else
+    os << "l.movhi" << " ";
+
+  os << "r" << int(decoder.getD()) ;
+
+  if (decoder.getOp2())
+    os << ", " << int(decoder.getK()) << " ";
+}
+void printRBRTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  switch(decoder.getOpcode()) {
+    case 0x11:
+      os << "l.jr" << " ";
+      break;
+    case 0x12:
+      os << "l.jalr" << " ";
+      break;
+  }
+  os << "r" << int(decoder.getB()) << " ";
+}
+// void printDABROOTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+//   switch(decoder.getOpcode()) {
+//     case 0x0A:
+//       os << "_._" << " ";
+//       break;
+//     case 0x32:
+//       os << "_._" << " ";
+//       break;
+//   }
+//   os << "r" << int(decoder.getD()) << ", ";
+//   os << "r" << int(decoder.getA()) << ", ";
+//   os << "r" << int(decoder.getB()) << " ";
+// }
+void printDAKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  switch(decoder.getOpcode()) {
+    case 0x29:
+      os << "l.andi" << " ";
+      break;
+    case 0x2A:
+      os << "l.ori" << " ";
+      break;
+    case 0x2D:
+      os << "l.mfspr" << " ";
+      break;
+  }
+  os << "r" << int(decoder.getD()) << ", ";
+  os << "r" << int(decoder.getA()) << ", ";
+  os << int(decoder.getK()) << " ";
+}
+void printSTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  switch(decoder.getOpcode()) {
+    case 0x33:
+      os << "l.swa" << " ";
+      break;
+    case 0x35:
+      os << "l.sw" << " ";
+      break;
+    case 0x36:
+      os << "l.sb" << " ";
+      break;
+    case 0x37:
+      os << "l.sh" << " ";
+      break;
+  }
+  os << int16_t(decoder.getImmediateI()) << "(" << "r" << int(decoder.getA()) << ")" << ", ";
+  os << "r" << int(decoder.getB()) << " ";
+}
+void printRABROTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  // 0x31
+  switch(decoder.getOp2()) {
+    case 0b0000:
+      os << "l.mac" << " ";
+      break;
+    case 0b0001:
+      os << "l.macu" << " ";
+      break;
+    case 0b0010:
+      os << "l.msb" << " ";
+      break;
+    case 0b0011:
+      os << "l.msbu" << " ";
+      break;
+  }
+  os << "r" << int(decoder.getA()) << ", ";
+  os << "r" << int(decoder.getB()) << " ";
+}
+void printSHTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  // 0x2E
+  switch (decoder.getOp2()) {
+    case 0b00:
+      os << "l.slli" << " ";
+      break;
+    case 0b01:
+      os << "l.srli" << " ";
+      break;
+    case 0b10:
+      os << "l.srai" << " ";
+      break;
+    case 0b11:
+      os << "l.rori" << " ";
+      break;
+  }
+  os << "r" << int(decoder.getD()) << ", ";
+  os << "r" << int(decoder.getA()) << ", ";
+  os << int(decoder.getL()) << " ";
+}
+void printJTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  switch(decoder.getOpcode()) {
+    case 0x00:
+      os << "l.j" << " ";
+      break;
+    case 0x01:
+      os << "l.jal" << " ";
+      break;
+    case 0x03:
+      os << "l.bnf" << " ";
+      break;
+    case 0x04:
+      os << "l.bf" << " ";
+      break;
+  }
+  os << decoder.getImmediateN() << " ";
+}
+void printOKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  // 0x08
+  switch (decoder.getOp2()) {
+    case 0b0000000000: 
+      os << "l.sys" << " ";
+      os << int(decoder.getK()) << " ";
+      break;
+    case 0b0100000000: 
+      os << "l.trap" << " ";
+      os << int(decoder.getK()) << " ";
+      break;
+    case 0b10000000000000000000000000: 
+      os << "l.msync" << " ";
+      break;
+    case 0b10100000000000000000000000: 
+      os << "l.psync" << " ";
+      break;
+    case 0b11000000000000000000000000: 
+      os << "l.csync" << " ";
+      break;
+  }
+}
+void printRESTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  switch(decoder.getOpcode()) {
+    case 0x09:
+      os << "l.rfe" << " ";
+      break;
+    case 0x1C:
+      os << "l.cust1" << " ";
+      break;
+    case 0x1D:
+      os << "l.cust2" << " ";
+      break;
+    case 0x1E:
+      os << "l.cust3" << " ";
+      break;
+    case 0x1F:
+      os << "l.cust4" << " ";
+      break;
+    case 0x3D:
+      os << "l.cust6" << " ";
+      break;
+    case 0x3E:
+      os << "l.cust7" << " ";
+      break;
+    case 0x3F:
+      os << "l.cust8" << " ";
+      break;
+  }
+}
+void printFTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  // 0x2F
+  switch(decoder.getOp2()) {
+    case 0b00000:
+      os << "l.sfeqi" << " ";
+      break;
+    case 0b00001:
+      os << "l.sfnei" << " ";
+      break;
+    case 0b00010:
+      os << "l.sfgtui" << " ";
+      break;
+    case 0b00011:
+      os << "l.sfgeui" << " ";
+      break;
+    case 0b00100:
+      os << "l.sfltui" << " ";
+      break;
+    case 0b00101:
+      os << "l.sfleui" << " ";
+      break;
+    case 0b01010:
+      os << "l.sfgtsi" << " ";
+      break;
+    case 0b01011:
+      os << "l.sfgesi" << " ";
+      break;
+    case 0b01100:
+      os << "l.sfltsi" << " ";
+      break;
+    case 0b01101:
+      os << "l.sflesi" << " ";
+      break;
+  }
+  os << "r" << int(decoder.getA()) << ", ";
+  os << int(decoder.getImmediateI()) << " ";
+}
+void printOABRTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  // 0x39
+  switch(decoder.getOp2()) {
+    case 0b00000:
+      os << "l.sfeq" << " ";
+      break;
+    case 0b00001:
+      os << "l.sfne" << " ";
+      break;
+    case 0b00010:
+      os << "l.sfgtu" << " ";
+      break;
+    case 0b00011:
+      os << "l.sfgeu" << " ";
+      break;
+    case 0b00100:
+      os << "l.sfltu" << " ";
+      break;
+    case 0b00101:
+      os << "l.sfleu" << " ";
+      break;
+    case 0b01010:
+      os << "l.sfgts" << " ";
+      break;
+    case 0b01011:
+      os << "l.sfges" << " ";
+      break;
+    case 0b01100:
+      os << "l.sflts" << " ";
+      break;
+    case 0b01101:
+      os << "l.sfles" << " ";
+      break;
+  }
+  os << "r" << int(decoder.getA()) << ", ";
+  os << "r" << int(decoder.getB()) << " ";
+}
+
+void printITypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  switch(decoder.getOpcode()) {
+    case 0x1A:
+      os << "l.lf" << " ";
+      break;
+    case 0x1B:
+      os << "l.lwa" << " ";
+      break;
+    case 0x20:
+      os << "l.ld" << " ";
+      break;
+    case 0x21:
+      os << "l.lwz" << " ";
+      break;
+    case 0x22:
+      os << "l.lws" << " ";
+      break;
+    case 0x23:
+      os << "l.lbz" << " ";
+      break;
+    case 0x24:
+      os << "l.lbs" << " ";
+      break;
+    case 0x25:
+      os << "l.lhz" << " ";
+      break;
+    case 0x26:
+      os << "l.lhs" << " ";
+      break;
+    case 0x27:
+      os << "l.addi" << " ";
+      break;
+    case 0x28:
+      os << "l.addic" << " ";
+      break;
+    case 0x2B:
+      os << "l.xori" << " ";
+      break;
+    case 0x2C:
+      os << "l.muli" << " ";
+      break;
+  }
+  os << "r" << int(decoder.getD()) << ", ";
+  if (decoder.getOpcode() <= 0x26)
+    os << int(decoder.getImmediateI()) << "(" << "r" << int(decoder.getA()) << ")" << " ";
+  else 
+    os << "r" << int(decoder.getA()) << ", " << int(decoder.getImmediateI()) << " ";
+}
+
+void printRTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
+  // 0x38
+  switch(decoder.getOp3()) {
+    case 0b0000:
+      os << "l.add" << " ";
+      break;
+    case 0b0001:
+      os << "l.addc" << " ";
+      break;
+    case 0b0010:
+      os << "l.sub" << " ";
+      break;
+    case 0b0011:
+      os << "l.and" << " ";
+      break;
+    case 0b0100:
+      os << "l.or" << " ";
+      break;
+    case 0b0101:
+      os << "l.xor" << " ";
+      break;
+    case 0b0110:
+      os << "l.mul" << " ";
+      break;
+    case 0b0111:
+      os << "l.muld" << " ";
+      break;
+    case 0b1000:
+      switch (decoder.getOp2()) {
+        case 0b0000:
+          os << "l.sll" << " ";
+          break;
+        case 0b0001:
+          os << "l.srl" << " ";
+          break;
+        case 0b0010:
+          os << "l.sra" << " ";
+          break;
+        case 0b0011:
+          os << "l.ror" << " ";
+          break;
+      }
+      break;
+    case 0b1001:
+      os << "l.div" << " ";
+      break;
+    case 0b1010:
+      os << "l.divu" << " ";
+      break;
+    case 0b1011:
+      os << "l.mulu" << " ";
+      break;
+    case 0b1100:
+      switch (decoder.getOp2()) {
+        case 0b0000:
+          os << "l.exths" << " ";
+          break;
+        case 0b0001:
+          os << "l.extbs" << " ";
+          break;
+        case 0b0010:
+          os << "l.exthz" << " ";
+          break;
+        case 0b0011:
+          if (!((decoder.getInstructionWord() << 9) | 0b1))
+            os << "l.extbz" << " ";
+          else
+            os << "l.muldu" << " ";
+          break;
+      }
+      break;
+    case 0b1101:
+      if (decoder.getOp2() == 0b0000)
+        os << "l.extws" << " ";
+      else
+        os << "l.extwz" << " ";
+      break;
+    case 0b1110:
+      os << "l.cmov" << " ";
+      break;
+    case 0b1111:
+      switch (decoder.getOp2()) {
+        case 0b00:
+          os << "l.ff1" << " ";
+          break;
+        case 0b01:
+          os << "l.fl1" << " ";
+          break;
+      }
+
+  }
+  if (int(decoder.getB()) != FIELD_NOT_AVAILABLE_8_BIT)
+    os << "r" << int(decoder.getD()) << ", ";
+  if (int(decoder.getB()) != FIELD_NOT_AVAILABLE_8_BIT)
+    os << "r" << int(decoder.getA()) << ", ";
+  if (int(decoder.getB()) != FIELD_NOT_AVAILABLE_8_BIT)
+    os << "r" << int(decoder.getB()) << " ";
+}
+
 std::ostream &
 operator<<(std::ostream &os, const InstructionDecoder &decoder)
 {
@@ -19,227 +451,69 @@ operator<<(std::ostream &os, const InstructionDecoder &decoder)
    * in "decoder" to the output stream "os". Do not include a newline.
    * And remove the statement below.
    */
-  os << "not implemented";
 
   switch (decoder.getInstructionType()) {
-    case INVALID:
-      os << "invalid opcode"
-      break;
     case R:
+      printRTypeInstruction(os, decoder);
       break;
     case I:
-      switch(decoder.getOpcode()) {
-        
-      }
+      printITypeInstruction(os, decoder);
       break;
     case S:
-      switch(decoder.getOpcode()) {
-        
-      }
+      printSTypeInstruction(os, decoder);
       break;
     case SH:
+      printSHTypeInstruction(os, decoder);
       break;
     case J:
-      switch(decoder.getOpcode()) {
-
-      }
+      printJTypeInstruction(os, decoder);
       break;
     case F:
+      printFTypeInstruction(os, decoder);
       break;
     case DN:
+      printDNTypeInstruction(os, decoder);
       break;
     case ORK:
+      printORKTypeInstruction(os, decoder);
       break;
     case DROK:
+      printDROKTypeInstruction(os, decoder);
       break;
     case OK:
+      printOKTypeInstruction(os, decoder);
       break;
     case RES:
-      switch(decoder.getOpcode()) {
-        
-      }
+      printRESTypeInstruction(os, decoder);
       break;
-    case DABROO:
-      switch(decoder.getOpcode()) {
-        
-      }
-      break;
+    // will take too much time i think  
+    // case DABROO:
+    //   printDABROOTypeInstruction(os, decoder);
+    //   break;
     case RBR:
-      switch(decoder.getOpcode()) {
-        
-      }
+      printRBRTypeInstruction(os, decoder);
       break;
     case RAI:
+      printRAITypeInstruction(os, decoder);
       break;
     case DAK:
-      switch(decoder.getOpcode()) {
-        
-      }
+      printDAKTypeInstruction(os, decoder);
       break;
     case KABK:
+      printKABKTypeInstruction(os, decoder);
       break;
     case RABRO:
+      printRABROTypeInstruction(os, decoder);
       break;
     case OABR:
+      printOABRTypeInstruction(os, decoder);
       break;
     case DABLK:
+      printDABLKTypeInstruction(os, decoder);
       break;
+    case INVALID:
+    default:
+      os << "invalid instruction";
   }
-
   return os;
 }
-
-
-// std::vector<std::string> getMnemonicFromOpcode(uint16_t opcode) {
-// 	std::vector<std::string> mnemonics;
-// 	switch (opcode) {
-// 		case 0x00:
-// 			mnemonics = {"l.j"};
-// 			break;
-// 		case 0x01:
-// 			mnemonics = {"l.jal"};
-// 			break;
-// 		case 0x02:
-// 			mnemonics = {"l.adrp"};
-// 			break;
-// 		case 0x03:
-// 			mnemonics = {"l.bnf"};
-// 			break;
-// 		case 0x04:
-// 			mnemonics = {"l.bf"};
-// 			break;
-// 		case 0x05:
-// 			mnemonics = {"l.nop"};
-// 			break;
-// 		case 0x06:
-// 			mnemonics = {"l.movhi", "l.macrc"};
-// 			break;
-// 		case 0x08:
-// 			mnemonics = {"l.sys", "l.trap", "l.msync", "l.psync", "l.csync"};
-// 			break;
-// 		case 0x09:
-// 			mnemonics = {"l.rfe"};
-// 			break;
-// 		case 0x0A:
-// 			mnemonics = {"lv.cust1", "lv.cust2", "lv.cust3", "lv.cust4", "lv.all_eq.b", "lv.all_eq.h", "lv.all_ge.b", "lv.all_ge.h", "lv.all_gt.b", "lv.all_gt.h", "lv.all_le.b", "lv.all_le.h", "lv.all_lt.b", "lv.all_lt.h", "lv.all_ne.b", "lv.all_ne.h", "lv.any_eq.b", "lv.any_eq.h", "lv.any_ge.b", "lv.any_ge.h", "lv.any_gt.b", "lv.any_gt.h", "lv.any_le.b", "lv.any_le.h", "lv.any_lt.b", "lv.any_lt.h", "lv.any_ne.b", "lv.any_ne.h", "lv.add.b", "lv.add.h", "lv.adds.b", "lv.adds.h", "lv.addu.b", "lv.addu.h", "lv.addus.b", "lv.addus.h", "lv.and", "lv.avg.b", "lv.avg.h", "lv.cmp_eq.b", "lv.cmp_eq.h", "lv.cmp_ge.b", "lv.cmp_ge.h", "lv.cmp_gt.b", "lv.cmp_gt.h", "lv.cmp_le.b", "lv.cmp_le.h", "lv.cmp_lt.b", "lv.cmp_lt.h", "lv.cmp_ne.b", "lv.cmp_ne.h", "lv.madds.h", "lv.max.b", "lv.max.h", "lv.merge.b", "lv.merge.h", "lv.min.b", "lv.min.h", "lv.msubs.h", "lv.muls.h", "lv.nand", "lv.nor", "lv.or", "lv.pack.b", "lv.pack.h", "lv.packs.b", "lv.packs.h", "lv.packus.b", "lv.packus.h", "lv.perm.n", "lv.rl.b", "lv.rl.h", "lv.sll.b", "lv.sll.h", "lv.sll", "lv.srl.b", "lv.srl.h", "lv.sra.b", "lv.sra.h", "lv.srl", "lv.sub.b", "lv.sub.h", "lv.subs.b", "lv.subs.h", "lv.subu.b", "lv.subu.h", "lv.subus.b", "lv.subus.h", "lv.unpack.b", "lv.unpack.h", "lv.xor"};
-// 			break;
-// 		case 0x11:
-// 			mnemonics = {"l.jr"};
-// 			break;
-// 		case 0x12:
-// 			mnemonics = {"l.jalr"};
-// 			break;
-// 		case 0x13:
-// 			mnemonics = {"l.maci"};
-// 			break;
-// 		case 0x1A:
-// 			mnemonics = {"l.lf"};
-// 			break;
-// 		case 0x1B:
-// 			mnemonics = {"l.lwa"};
-// 			break;
-// 		case 0x1C:
-// 			mnemonics = {"l.cust1"};
-// 			break;
-// 		case 0x1D:
-// 			mnemonics = {"l.cust2"};
-// 			break;
-// 		case 0x1E:
-// 			mnemonics = {"l.cust3"};
-// 			break;
-// 		case 0x1F:
-// 			mnemonics = {"l.cust4"};
-// 			break;
-// 		case 0x20:
-// 			mnemonics = {"l.ld"};
-// 			break;
-// 		case 0x21:
-// 			mnemonics = {"l.lwz"};
-// 			break;
-// 		case 0x22:
-// 			mnemonics = {"l.lws"};
-// 			break;
-// 		case 0x23:
-// 			mnemonics = {"l.lbz"};
-// 			break;
-// 		case 0x24:
-// 			mnemonics = {"l.lbs"};
-// 			break;
-// 		case 0x25:
-// 			mnemonics = {"l.lhz"};
-// 			break;
-// 		case 0x26:
-// 			mnemonics = {"l.lhs"};
-// 			break;
-// 		case 0x27:
-// 			mnemonics = {"l.addi"};
-// 			break;
-// 		case 0x28:
-// 			mnemonics = {"l.addic"};
-// 			break;
-// 		case 0x29:
-// 			mnemonics = {"l.andi"};
-// 			break;
-// 		case 0x2A:
-// 			mnemonics = {"l.ori"};
-// 			break;
-// 		case 0x2B:
-// 			mnemonics = {"l.xori"};
-// 			break;
-// 		case 0x2C:
-// 			mnemonics = {"l.muli"};
-// 			break;
-// 		case 0x2D:
-// 			mnemonics = {"l.mfspr"};
-// 			break;
-// 		case 0x2E:
-// 			mnemonics = {"l.slli", "l.srli", "l.srai", "l.rori"};
-// 			break;
-// 		case 0x2F:
-// 			mnemonics = {"l.sfeqi", "l.sfnei", "l.sfgtui", "l.sfgeui", "l.sfltui", "l.sfleui", "l.sfgtsi", "l.sfgesi", "l.sfltsi", "l.sflesi"};
-// 			break;
-// 		case 0x30:
-// 			mnemonics = {"l.mtspr"};
-// 			break;
-// 		case 0x31:
-// 			mnemonics = {"l.mac", "l.macu", "l.msb", "l.msbu"};
-// 			break;
-// 		case 0x32:
-// 			mnemonics = {"lf.sfeq.s", "lf.sfne.s", "lf.sfgt.s", "lf.sfge.s", "lf.sflt.s", "lf.sfle.s", "lf.sfeq.d", "lf.sfne.d", "lf.sfgt.d", "lf.sfge.d", "lf.sflt.d", "lf.sfle.d", "lf.sfueq.s", "lf.sfune.s", "lf.sfugt.s", "lf.sfuge.s", "lf.sfult.s", "lf.sfule.s", "lf.sfun.s", "lf.stod.d", "lf.dtos.d", "lf.sfueq.d", "lf.sfune.d", "lf.sfugt.d", "lf.sfuge.d", "lf.sfult.d", "lf.sfule.d", "lf.sfun.d", "lf.cust1.s", "lf.cust1.d", "lf.itof.s", "lf.ftoi.s", "lf.itof.d", "lf.ftoi.d", "lf.add.s", "lf.sub.s", "lf.mul.s", "lf.div.s", "lf.madd.s", "lf.add.d", "lf.sub.d", "lf.mul.d", "lf.div.d", "lf.madd.d"};
-// 			break;
-// 		case 0x33:
-// 			mnemonics = {"l.swa"};
-// 			break;
-// 		case 0x35:
-// 			mnemonics = {"l.sw"};
-// 			break;
-// 		case 0x36:
-// 			mnemonics = {"l.sb"};
-// 			break;
-// 		case 0x37:
-// 			mnemonics = {"l.sh"};
-// 			break;
-// 		case 0x38:
-// 			mnemonics = {"l.exths", "l.extws", "l.extbs", "l.extwz", "l.exthz", "l.extbz", "l.add", "l.addc", "l.sub", "l.and", "l.or", "l.xor", "l.cmov", "l.ff1", "l.sll", "l.srl", "l.sra", "l.ror", "l.fl1", "l.mul", "l.muld", "l.div", "l.divu", "l.mulu", "l.muldu"};
-// 			break;
-// 		case 0x39:
-// 			mnemonics = {"l.sfeq", "l.sfne", "l.sfgtu", "l.sfgeu", "l.sfltu", "l.sfleu", "l.sfgts", "l.sfges", "l.sflts", "l.sfles"};
-// 			break;
-// 		case 0x3C:
-// 			mnemonics = {"l.cust5"};
-// 			break;
-// 		case 0x3D:
-// 			mnemonics = {"l.cust6"};
-// 			break;
-// 		case 0x3E:
-// 			mnemonics = {"l.cust7"};
-// 			break;
-// 		case 0x3F:
-// 			mnemonics = {"l.cust8"};
-// 			break;
-// 		default:
-// 			mnemonics = {"INVALID"};
-// 			break;
-// 	}
-// 	return mnemonics;
-// }

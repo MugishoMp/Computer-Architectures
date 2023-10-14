@@ -571,16 +571,16 @@ TEST(InstructionDecoderTest, GetImmediateIShouldReturnCorrectValue) {
     uint8_t i_opcodes[] = {0x1A, 0x1B, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x2B, 0x2C};
     for (auto op : i_opcodes) {
         decoder.setInstructionWord((op << 26) | BITS_15_0);
-        EXPECT_EQ(decoder.getImmediateI(), 0xFFFF);
+        EXPECT_EQ(decoder.getImmediateI(), int8_t(0xFFFF));
     }
 
     // For F Type
     decoder.setInstructionWord((0x2F << 26) | BITS_15_0);
-    EXPECT_EQ(decoder.getImmediateI(), 0xFFFF);
+    EXPECT_EQ(decoder.getImmediateI(), int8_t(0xFFFF));
 
     // For RAI Type
     decoder.setInstructionWord((0x13 << 26) | BITS_15_0);
-    EXPECT_EQ(decoder.getImmediateI(), 0xFFFF);
+    EXPECT_EQ(decoder.getImmediateI(), int8_t(0xFFFF));
 
     // For S Type
     uint8_t s_opcodes[] = {0x33, 0x35, 0x36, 0x37};
