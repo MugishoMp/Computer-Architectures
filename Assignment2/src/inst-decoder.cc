@@ -124,6 +124,8 @@ InstructionDecoder::getInstructionType() const
     case 0x3C:
       instructionType = DABLK;
       break;
+    default:
+      throw IllegalInstruction("This opcode does not exist");
   }
 
   return instructionType;
@@ -179,7 +181,7 @@ InstructionDecoder::getOp2() const
       op2 = (getInstructionWord() & BITS_25_21) >> 21; // Right shift by 8 bits
       break;
     default:
-      op2 = FIELD_NOT_AVAILABLE_32_BIT;
+      throw IllegalInstruction("Op2 field not available for this instruction type");
   }
 
   return op2;  /* result undefined */
@@ -195,7 +197,7 @@ InstructionDecoder::getOp3() const
       op3 = (getInstructionWord() & BITS_3_0) >> 0; // Right shift by 8 bits
       break;
     default:
-      op3 = FIELD_NOT_AVAILABLE_8_BIT;
+      throw IllegalInstruction("Op3 field not available for this instruction type");
   }
 
   return op3;  /* result undefined */
@@ -222,7 +224,7 @@ InstructionDecoder::getA() const
       A = (getInstructionWord() & BITS_20_16) >> 16; // Right shift by 8 bits
       break;
     default:
-      A = FIELD_NOT_AVAILABLE_8_BIT;
+      throw IllegalInstruction("A register field not available for this instruction type");
   }
 
   return A;  /* result undefined */
@@ -245,7 +247,7 @@ InstructionDecoder::getB() const
       B = (getInstructionWord() & BITS_15_11) >> 11; // Right shift by 8 bits
       break;
     default:
-      B = FIELD_NOT_AVAILABLE_8_BIT;
+      throw IllegalInstruction("B register field not available for this instruction type");
   }
 
   return B;  /* result undefined */
@@ -268,7 +270,7 @@ InstructionDecoder::getD() const
       D = (getInstructionWord() & BITS_25_21) >> 21; // Right shift by 8 bits
       break;
     default:
-      D = FIELD_NOT_AVAILABLE_8_BIT;
+      throw IllegalInstruction("D register field not available for this instruction type");
   }
   return D;  /* result undefined */
 }
@@ -292,7 +294,7 @@ InstructionDecoder::getImmediateI() const
       if (immediateI >> 10 & 0b1) immediateI = immediateI | (0b11111 << 11);
       break;
     default:
-      immediateI = FIELD_NOT_AVAILABLE_16_BIT;
+      throw IllegalInstruction("Immediate I field not available for this instruction type");
   }
 
   return immediateI;  /* result undefined */
@@ -314,7 +316,7 @@ InstructionDecoder::getImmediateN() const
       if (immediateN >> 20 & 0b1) immediateN = immediateN | (0b11111111111 << 21);
       break;
     default:
-      immediateN = FIELD_NOT_AVAILABLE_32_BIT;
+      throw IllegalInstruction("Immediate N field not available for this instruction type");
   }
 
   return immediateN;  /* result undefined */
@@ -379,7 +381,7 @@ InstructionDecoder::getReserved() const
       reserved = (getInstructionWord() & BITS_10_0) >> 0; // Right shift by 8 bits
       break;
     default:
-      reserved = FIELD_NOT_AVAILABLE_32_BIT;
+      throw IllegalInstruction("Reserved field not available for this instruction type");
   }
 
   return reserved;  /* result undefined */
@@ -398,7 +400,7 @@ InstructionDecoder::getL() const
       L = (getInstructionWord() & BITS_10_5) >> 5; // Right shift by 8 bits
       break;
     default:
-      L = FIELD_NOT_AVAILABLE_8_BIT;
+      throw IllegalInstruction("L field not available for this instruction type");
   }
 
   return L;  /* result undefined */
@@ -425,6 +427,7 @@ InstructionDecoder::getK() const
       break;
     default:
       K = FIELD_NOT_AVAILABLE_32_BIT;
+      throw IllegalInstruction("K field not available for this instruction type");
   }
 
   return K;  /* result undefined */
@@ -452,12 +455,11 @@ InstructionDecoder::getO() const
         O = (getInstructionWord() & BITS_10_8) >> 8; // Right shift by 8 bits
       break;
     default:
-      O = FIELD_NOT_AVAILABLE_8_BIT;
+      throw IllegalInstruction("O field not available for this instruction type");
   }
 
   return O;  /* result undefined */
 }
-
 
 InstructionMnemonic 
 InstructionDecoder::getFunctionCode() const
@@ -524,7 +526,7 @@ InstructionDecoder::getFunctionCode() const
       break;
     case INVALID:
     default:
-      throw IllegalInstruction("Instruction is invalid");
+      throw IllegalInstruction("This instruction is invalid");
   }
   return functionCode;
 }
