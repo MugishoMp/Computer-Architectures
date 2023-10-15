@@ -201,37 +201,6 @@ InstructionDecoder::getOp3() const
   return op3;  /* result undefined */
 }
 
-
-// function that maps opcode + op2 + op3 to an enum
-// uint8_t
-// InstructionDecoder::getFunctionCode() const
-// {
-//   uint8_t op2 = 0;
-
-//   switch (getInstructionType()) {
-//     case R:
-//       op2 = (getOp2() << 4) | getOp3(); // Right shift by 8 bits
-//       break;
-//     case SH:
-//       op2 = getOp2(); // Right shift by 8 bits
-//       break;
-//     case ORK:
-//       break;
-//     case DROK:
-//       break;
-//     case OK:
-//       break;
-//     case DABROO:
-//       break;
-//     case OABR:
-//       break;
-//     default:
-//       op2 = FIELD_NOT_AVAILABLE_8_BIT;
-//   }
-
-//   return op2;  /* result undefined */
-// }
-
 RegNumber
 InstructionDecoder::getA() const
 {
@@ -487,4 +456,518 @@ InstructionDecoder::getO() const
   }
 
   return O;  /* result undefined */
+}
+
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCode() const
+{
+  InstructionMnemonic functionCode = InstructionMnemonic::INVALID;
+  switch (getInstructionType()) {
+    case R:
+      functionCode = getFunctionCodeRTypeInstruction();
+      break;
+    case I:
+      functionCode = getFunctionCodeITypeInstruction();
+      break;
+    case S:
+      functionCode = getFunctionCodeSTypeInstruction();
+      break;
+    case SH:
+      functionCode = getFunctionCodeSHTypeInstruction();
+      break;
+    case J:
+      functionCode = getFunctionCodeJTypeInstruction();
+      break;
+    case F:
+      functionCode = getFunctionCodeFTypeInstruction();
+      break;
+    case DN:
+      functionCode = getFunctionCodeDNTypeInstruction();
+      break;
+    case ORK:
+      functionCode = getFunctionCodeORKTypeInstruction();
+      break;
+    case DROK:
+      functionCode = getFunctionCodeDROKTypeInstruction();
+      break;
+    case OK:
+      functionCode = getFunctionCodeOKTypeInstruction();
+      break;
+    case RES:
+      functionCode = getFunctionCodeRESTypeInstruction();
+      break;
+    // will take too much time i think  
+    // case DABROO:
+    //   functionCode = getFunctionCodeDABROOTypeInstruction();
+    //   break;
+    case RBR:
+      functionCode = getFunctionCodeRBRTypeInstruction();
+      break;
+    case RAI:
+      functionCode = getFunctionCodeRAITypeInstruction();
+      break;
+    case DAK:
+      functionCode = getFunctionCodeDAKTypeInstruction();
+      break;
+    case KABK:
+      functionCode = getFunctionCodeKABKTypeInstruction();
+      break;
+    case RABRO:
+      functionCode = getFunctionCodeRABROTypeInstruction();
+      break;
+    case OABR:
+      functionCode = getFunctionCodeOABRTypeInstruction();
+      break;
+    case DABLK:
+      functionCode = getFunctionCodeDABLKTypeInstruction();
+      break;
+    case INVALID:
+    default:
+      throw IllegalInstruction("Instruction is invalid");
+  }
+  return functionCode;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeRTypeInstruction() const
+{// 0x38
+  InstructionMnemonic functionCode = InstructionMnemonic::INVALID;
+  switch(getOp3()) {
+    case 0b0000:
+      functionCode = InstructionMnemonic::L_ADD;
+      break;
+    case 0b0001:
+      functionCode = InstructionMnemonic::L_ADDC;
+      break;
+    case 0b0010:
+      functionCode = InstructionMnemonic::L_SUB;
+      break;
+    case 0b0011:
+      functionCode = InstructionMnemonic::L_AND;
+      break;
+    case 0b0100:
+      functionCode = InstructionMnemonic::L_OR;
+      break;
+    case 0b0101:
+      functionCode = InstructionMnemonic::L_XOR;
+      break;
+    case 0b0110:
+      functionCode = InstructionMnemonic::L_MUL;
+      break;
+    case 0b0111:
+      functionCode = InstructionMnemonic::L_MULD;
+      break;
+    case 0b1000:
+      switch (getOp2()) {
+        case 0b0000:
+          functionCode = InstructionMnemonic::L_SLL;
+          break;
+        case 0b0001:
+          functionCode = InstructionMnemonic::L_SRL;
+          break;
+        case 0b0010:
+          functionCode = InstructionMnemonic::L_SRA;
+          break;
+        case 0b0011:
+          functionCode = InstructionMnemonic::L_ROR;
+          break;
+      }
+      break;
+    case 0b1001:
+      functionCode = InstructionMnemonic::L_DIV;
+      break;
+    case 0b1010:
+      functionCode = InstructionMnemonic::L_DIVU;
+      break;
+    case 0b1011:
+      functionCode = InstructionMnemonic::L_MULU;
+      break;
+    case 0b1100:
+      switch (getOp2()) {
+        case 0b0000:
+          functionCode = InstructionMnemonic::L_EXTHS;
+          break;
+        case 0b0001:
+          functionCode = InstructionMnemonic::L_EXTBS;
+          break;
+        case 0b0010:
+          functionCode = InstructionMnemonic::L_EXTHZ;
+          break;
+        case 0b0011:
+          if (!((getInstructionWord() << 9) | 0b1))
+            functionCode = InstructionMnemonic::L_EXTBZ;
+          else
+            functionCode = InstructionMnemonic::L_MULDU;
+          break;
+      }
+      break;
+    case 0b1101:
+      if (getOp2() == 0b0000)
+        functionCode = InstructionMnemonic::L_EXTWS;
+      else
+        functionCode = InstructionMnemonic::L_EXTWZ;
+      break;
+    case 0b1110:
+      functionCode = InstructionMnemonic::L_CMOV;
+      break;
+    case 0b1111:
+      switch (getOp2()) {
+        case 0b00:
+          functionCode = InstructionMnemonic::L_FF1;
+          break;
+        case 0b01:
+          functionCode = InstructionMnemonic::L_FL1;
+          break;
+      }
+  }
+  return functionCode;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeITypeInstruction() const
+{
+  InstructionMnemonic functionCode = InstructionMnemonic::INVALID;
+  switch(getOpcode()) {
+    case 0x1A:
+      functionCode = InstructionMnemonic::L_LF;
+      break;
+    case 0x1B:
+      functionCode = InstructionMnemonic::L_LWA;
+      break;
+    case 0x20:
+      functionCode = InstructionMnemonic::L_LD;
+      break;
+    case 0x21:
+      functionCode = InstructionMnemonic::L_LWZ;
+      break;
+    case 0x22:
+      functionCode = InstructionMnemonic::L_LWS;
+      break;
+    case 0x23:
+      functionCode = InstructionMnemonic::L_LBZ;
+      break;
+    case 0x24:
+      functionCode = InstructionMnemonic::L_LBS;
+      break;
+    case 0x25:
+      functionCode = InstructionMnemonic::L_LHZ;
+      break;
+    case 0x26:
+      functionCode = InstructionMnemonic::L_LHS;
+      break;
+    case 0x27:
+      functionCode = InstructionMnemonic::L_ADDI;
+      break;
+    case 0x28:
+      functionCode = InstructionMnemonic::L_ADDIC;
+      break;
+    case 0x2B:
+      functionCode = InstructionMnemonic::L_XORI;
+      break;
+    case 0x2C:
+      functionCode = InstructionMnemonic::L_MULI;
+      break;
+  }
+  return functionCode;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeSTypeInstruction() const
+{
+  InstructionMnemonic functionCode = InstructionMnemonic::INVALID;
+  switch(getOpcode()) {
+    case 0x33:
+      functionCode = InstructionMnemonic::L_SWA;
+      break;
+    case 0x35:
+      functionCode = InstructionMnemonic::L_SW;
+      break;
+    case 0x36:
+      functionCode = InstructionMnemonic::L_SB;
+      break;
+    case 0x37:
+      functionCode = InstructionMnemonic::L_SH;
+      break;
+  }
+  return functionCode;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeSHTypeInstruction() const
+{
+  InstructionMnemonic functionCode = InstructionMnemonic::INVALID;
+  switch (getOp2()) {
+    case 0b00:
+      functionCode = InstructionMnemonic::L_SLLI;
+      break;
+    case 0b01:
+      functionCode = InstructionMnemonic::L_SRLI;
+      break;
+    case 0b10:
+      functionCode = InstructionMnemonic::L_SRAI;
+      break;
+    case 0b11:
+      functionCode = InstructionMnemonic::L_RORI;
+      break;
+  }
+  return functionCode;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeJTypeInstruction() const
+{
+  InstructionMnemonic functionCode = InstructionMnemonic::INVALID;
+  switch(getOpcode()) {
+    case 0x00:
+      functionCode = InstructionMnemonic::L_J;
+      break;
+    case 0x01:
+      functionCode = InstructionMnemonic::L_J;
+      break;
+    case 0x03:
+      functionCode = InstructionMnemonic::L_BNF;
+      break;
+    case 0x04:
+      functionCode = InstructionMnemonic::L_BF;
+      break;
+  }
+  return functionCode;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeFTypeInstruction() const
+{
+  InstructionMnemonic functionCode = InstructionMnemonic::INVALID;
+  switch(getOp2()) {
+    case 0b00000:
+      functionCode = InstructionMnemonic::L_SFEQI;
+      break;
+    case 0b00001:
+      functionCode = InstructionMnemonic::L_SFNEI;
+      break;
+    case 0b00010:
+      functionCode = InstructionMnemonic::L_SFGTUI;
+      break;
+    case 0b00011:
+      functionCode = InstructionMnemonic::L_SFGEUI;
+      break;
+    case 0b00100:
+      functionCode = InstructionMnemonic::L_SFLTUI;
+      break;
+    case 0b00101:
+      functionCode = InstructionMnemonic::L_SFLEUI;
+      break;
+    case 0b01010:
+      functionCode = InstructionMnemonic::L_SFGTSI;
+      break;
+    case 0b01011:
+      functionCode = InstructionMnemonic::L_SFGESI;
+      break;
+    case 0b01100:
+      functionCode = InstructionMnemonic::L_SFLTSI;
+      break;
+    case 0b01101:
+      functionCode = InstructionMnemonic::L_SFLESI;
+      break;
+  }
+  return functionCode;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeDNTypeInstruction() const
+{
+  return InstructionMnemonic::L_ADRP;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeORKTypeInstruction() const
+{
+  return InstructionMnemonic::L_NOP;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeDROKTypeInstruction() const
+{
+  InstructionMnemonic functionCode = InstructionMnemonic::INVALID;
+  if (getOp2())
+    functionCode = InstructionMnemonic::L_MACRC;
+  else
+    functionCode = InstructionMnemonic::L_MOVHI;
+  return functionCode;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeOKTypeInstruction() const
+{
+  InstructionMnemonic functionCode = InstructionMnemonic::INVALID;
+  switch (getOp2()) {
+    case 0b0000000000: 
+      functionCode = InstructionMnemonic::L_SYS;
+      break;
+    case 0b0100000000: 
+      functionCode = InstructionMnemonic::L_TRAP;
+      break;
+    case 0b10000000000000000000000000: 
+      functionCode = InstructionMnemonic::L_MSYNC;
+      break;
+    case 0b10100000000000000000000000: 
+      functionCode = InstructionMnemonic::L_PSYNC;
+      break;
+    case 0b11000000000000000000000000: 
+      functionCode = InstructionMnemonic::L_CSYNC;
+      break;
+  }
+  return functionCode;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeRESTypeInstruction() const
+{
+  InstructionMnemonic functionCode = InstructionMnemonic::INVALID;
+  switch(getOpcode()) {
+    case 0x09:
+      functionCode = InstructionMnemonic::L_RFE;
+      break;
+    case 0x1C:
+      functionCode = InstructionMnemonic::L_CUST1;
+      break;
+    case 0x1D:
+      functionCode = InstructionMnemonic::L_CUST2;
+      break;
+    case 0x1E:
+      functionCode = InstructionMnemonic::L_CUST3;
+      break;
+    case 0x1F:
+      functionCode = InstructionMnemonic::L_CUST4;
+      break;
+    case 0x3D:
+      functionCode = InstructionMnemonic::L_CUST6;
+      break;
+    case 0x3E:
+      functionCode = InstructionMnemonic::L_CUST7;
+      break;
+    case 0x3F:
+      functionCode = InstructionMnemonic::L_CUST8;
+      break;
+  }
+  return functionCode;
+}
+
+// InstructionMnemonic 
+// InstructionDecoder::getFunctionCodeDABROOTypeInstruction()
+// {
+//  return InstructionMnemonic::L_ADD;
+
+// }
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeRBRTypeInstruction() const
+{
+  InstructionMnemonic functionCode = InstructionMnemonic::INVALID;
+  switch(getOpcode()) {
+    case 0x11:
+      functionCode = InstructionMnemonic::L_JR;
+      break;
+    case 0x12:
+      functionCode = InstructionMnemonic::L_JALR;
+      break;
+  }
+  return functionCode;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeRAITypeInstruction() const
+{
+  return InstructionMnemonic::L_MACI;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeDAKTypeInstruction() const
+{
+  InstructionMnemonic functionCode = InstructionMnemonic::INVALID;
+  switch(getOpcode()) {
+    case 0x29:
+      functionCode = InstructionMnemonic::L_ANDI;
+      break;
+    case 0x2A:
+      functionCode = InstructionMnemonic::L_ORI;
+      break;
+    case 0x2D:
+      functionCode = InstructionMnemonic::L_MFSPR;
+      break;
+  }
+  return functionCode;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeKABKTypeInstruction() const
+{
+  return InstructionMnemonic::L_MTSPR;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeRABROTypeInstruction() const
+{
+  InstructionMnemonic functionCode = InstructionMnemonic::INVALID;
+  switch(getOp2()) {
+    case 0b0000:
+      functionCode = InstructionMnemonic::L_MAC;
+      break;
+    case 0b0001:
+      functionCode = InstructionMnemonic::L_MACU;
+      break;
+    case 0b0010:
+      functionCode = InstructionMnemonic::L_MSB;
+      break;
+    case 0b0011:
+      functionCode = InstructionMnemonic::L_MSBU;
+      break;
+  }
+  return functionCode;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeOABRTypeInstruction() const
+{
+  InstructionMnemonic functionCode = InstructionMnemonic::INVALID;
+  switch(getOp2()) {
+    case 0b00000:
+      functionCode = InstructionMnemonic::L_SFEQ;
+      break;
+    case 0b00001:
+      functionCode = InstructionMnemonic::L_SFNE;
+      break;
+    case 0b00010:
+      functionCode = InstructionMnemonic::L_SFGTU;
+      break;
+    case 0b00011:
+      functionCode = InstructionMnemonic::L_SFGEU;
+      break;
+    case 0b00100:
+      functionCode = InstructionMnemonic::L_SFLTU;
+      break;
+    case 0b00101:
+      functionCode = InstructionMnemonic::L_SFLEU;
+      break;
+    case 0b01010:
+      functionCode = InstructionMnemonic::L_SFGTS;
+      break;
+    case 0b01011:
+      functionCode = InstructionMnemonic::L_SFGES;
+      break;
+    case 0b01100:
+      functionCode = InstructionMnemonic::L_SFLTS;
+      break;
+    case 0b01101:
+      functionCode = InstructionMnemonic::L_SFLES;
+      break;
+  }
+  return functionCode;
+}
+
+InstructionMnemonic 
+InstructionDecoder::getFunctionCodeDABLKTypeInstruction() const
+{
+  return InstructionMnemonic::L_CUST5;
 }

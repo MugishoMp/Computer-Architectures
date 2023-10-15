@@ -10,6 +10,7 @@
 #include <functional>
 #include <map>
 #include <iostream>
+#include <sstream>
 
 
 void printDNTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
@@ -21,7 +22,17 @@ void printDNTypeInstruction(std::ostream &os, const InstructionDecoder &decoder)
 void printORKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x05
   os << "l.nop" << " ";
-  os << int(decoder.getK()) << " ";
+  
+  // Create a stringstream
+  std::stringstream ss;
+
+  // Convert the integer to a hexadecimal string
+  ss << std::hex << int(decoder.getK());
+
+  // Get the hexadecimal string from the stringstream
+  std::string hexString = ss.str();
+
+  os << "0x" << hexString << " ";
 }
 void printRAITypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x13
@@ -47,22 +58,33 @@ void printDABLKTypeInstruction(std::ostream &os, const InstructionDecoder &decod
 }
 void printDROKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x06
-  if (decoder.getOp2())
+  if (decoder.getFunctionCode() == InstructionMnemonic::L_MACRC)
     os << "l.macrc" << " ";
   else
     os << "l.movhi" << " ";
 
   os << "r" << int(decoder.getD()) ;
 
-  if (decoder.getOp2())
-    os << ", " << int(decoder.getK()) << " ";
+  if (decoder.getFunctionCode() == InstructionMnemonic::L_MOVHI) {
+    
+    // Create a stringstream
+    std::stringstream ss;
+
+    // Convert the integer to a hexadecimal string
+    ss << std::hex << int(decoder.getK());
+
+    // Get the hexadecimal string from the stringstream
+    std::string hexString = ss.str();
+
+    os << "0x" << hexString << " ";
+  }
 }
 void printRBRTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
-  switch(decoder.getOpcode()) {
-    case 0x11:
+  switch(decoder.getFunctionCode()) {
+    case InstructionMnemonic::L_JR:
       os << "l.jr" << " ";
       break;
-    case 0x12:
+    case InstructionMnemonic::L_JALR:
       os << "l.jalr" << " ";
       break;
   }
@@ -82,33 +104,43 @@ void printRBRTypeInstruction(std::ostream &os, const InstructionDecoder &decoder
 //   os << "r" << int(decoder.getB()) << " ";
 // }
 void printDAKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
-  switch(decoder.getOpcode()) {
-    case 0x29:
+  switch(decoder.getFunctionCode()) {
+    case InstructionMnemonic::L_ANDI:
       os << "l.andi" << " ";
       break;
-    case 0x2A:
+    case InstructionMnemonic::L_ORI:
       os << "l.ori" << " ";
       break;
-    case 0x2D:
+    case InstructionMnemonic::L_MFSPR:
       os << "l.mfspr" << " ";
       break;
   }
   os << "r" << int(decoder.getD()) << ", ";
   os << "r" << int(decoder.getA()) << ", ";
-  os << int(decoder.getK()) << " ";
+
+  // Create a stringstream
+  std::stringstream ss;
+
+  // Convert the integer to a hexadecimal string
+  ss << std::hex << int(decoder.getK());
+
+  // Get the hexadecimal string from the stringstream
+  std::string hexString = ss.str();
+
+  os << "0x" << hexString << " ";
 }
 void printSTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
-  switch(decoder.getOpcode()) {
-    case 0x33:
+  switch(decoder.getFunctionCode()) {
+    case InstructionMnemonic::L_SWA:
       os << "l.swa" << " ";
       break;
-    case 0x35:
+    case InstructionMnemonic::L_SW:
       os << "l.sw" << " ";
       break;
-    case 0x36:
+    case InstructionMnemonic::L_SB:
       os << "l.sb" << " ";
       break;
-    case 0x37:
+    case InstructionMnemonic::L_SH:
       os << "l.sh" << " ";
       break;
   }
@@ -117,17 +149,17 @@ void printSTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
 }
 void printRABROTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x31
-  switch(decoder.getOp2()) {
-    case 0b0000:
+  switch(decoder.getFunctionCode()) {
+    case InstructionMnemonic::L_MAC:
       os << "l.mac" << " ";
       break;
-    case 0b0001:
+    case InstructionMnemonic::L_MACU:
       os << "l.macu" << " ";
       break;
-    case 0b0010:
+    case InstructionMnemonic::L_MSB:
       os << "l.msb" << " ";
       break;
-    case 0b0011:
+    case InstructionMnemonic::L_MSBU:
       os << "l.msbu" << " ";
       break;
   }
@@ -136,17 +168,17 @@ void printRABROTypeInstruction(std::ostream &os, const InstructionDecoder &decod
 }
 void printSHTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x2E
-  switch (decoder.getOp2()) {
-    case 0b00:
+  switch (decoder.getFunctionCode()) {
+    case InstructionMnemonic::L_SLLI:
       os << "l.slli" << " ";
       break;
-    case 0b01:
+    case InstructionMnemonic::L_SRLI:
       os << "l.srli" << " ";
       break;
-    case 0b10:
+    case InstructionMnemonic::L_SRAI:
       os << "l.srai" << " ";
       break;
-    case 0b11:
+    case InstructionMnemonic::L_RORI:
       os << "l.rori" << " ";
       break;
   }
@@ -155,103 +187,106 @@ void printSHTypeInstruction(std::ostream &os, const InstructionDecoder &decoder)
   os << int(decoder.getL()) << " ";
 }
 void printJTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
-  switch(decoder.getOpcode()) {
-    case 0x00:
+  switch(decoder.getFunctionCode()) {
+    case InstructionMnemonic::L_J:
       os << "l.j" << " ";
       break;
-    case 0x01:
+    case InstructionMnemonic::L_JAL:
       os << "l.jal" << " ";
       break;
-    case 0x03:
+    case InstructionMnemonic::L_BNF:
       os << "l.bnf" << " ";
       break;
-    case 0x04:
+    case InstructionMnemonic::L_BF:
       os << "l.bf" << " ";
       break;
   }
-  os << uint_(decoder.getImmediateN()) << " ";
+
+  // how do i know what the instruction address is?
+  // os << isntructionAddresss + (decoder.getImmediateN() << 2) << " ";
+  os << "(" << "<current instruction address> + " << decoder.getImmediateN() << ")" << " ";
 }
 void printOKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x08
-  switch (decoder.getOp2()) {
-    case 0b0000000000: 
+  switch (decoder.getFunctionCode()) {
+    case InstructionMnemonic::L_SYS: 
       os << "l.sys" << " ";
       os << int(decoder.getK()) << " ";
       break;
-    case 0b0100000000: 
+    case InstructionMnemonic::L_TRAP: 
       os << "l.trap" << " ";
       os << int(decoder.getK()) << " ";
       break;
-    case 0b10000000000000000000000000: 
+    case InstructionMnemonic::L_MSYNC: 
       os << "l.msync" << " ";
       break;
-    case 0b10100000000000000000000000: 
+    case InstructionMnemonic::L_PSYNC: 
       os << "l.psync" << " ";
       break;
-    case 0b11000000000000000000000000: 
+    case InstructionMnemonic::L_CSYNC: 
       os << "l.csync" << " ";
       break;
   }
 }
 void printRESTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
-  switch(decoder.getOpcode()) {
-    case 0x09:
+  switch(decoder.getFunctionCode()) {
+    case InstructionMnemonic::L_RFE:
       os << "l.rfe" << " ";
       break;
-    case 0x1C:
+    case InstructionMnemonic::L_CUST1:
       os << "l.cust1" << " ";
       break;
-    case 0x1D:
+    case InstructionMnemonic::L_CUST2:
       os << "l.cust2" << " ";
       break;
-    case 0x1E:
+    case InstructionMnemonic::L_CUST3:
       os << "l.cust3" << " ";
       break;
-    case 0x1F:
+    case InstructionMnemonic::L_CUST4:
       os << "l.cust4" << " ";
       break;
-    case 0x3D:
+    case InstructionMnemonic::L_CUST6:
       os << "l.cust6" << " ";
       break;
-    case 0x3E:
+    case InstructionMnemonic::L_CUST7:
       os << "l.cust7" << " ";
       break;
-    case 0x3F:
+    case InstructionMnemonic::L_CUST8:
       os << "l.cust8" << " ";
       break;
   }
 }
 void printFTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x2F
-  switch(decoder.getOp2()) {
-    case 0b00000:
+  switch(decoder.getFunctionCode()) {
+    case InstructionMnemonic::L_SFEQI:
       os << "l.sfeqi" << " ";
       break;
-    case 0b00001:
+    case InstructionMnemonic::L_SFNEI:
       os << "l.sfnei" << " ";
       break;
-    case 0b00010:
+    case InstructionMnemonic::L_SFGTUI:
       os << "l.sfgtui" << " ";
       break;
-    case 0b00011:
+    case InstructionMnemonic::L_SFGEUI:
       os << "l.sfgeui" << " ";
       break;
-    case 0b00100:
+    case InstructionMnemonic::L_SFLTUI:
       os << "l.sfltui" << " ";
       break;
-    case 0b00101:
+    case InstructionMnemonic::L_SFLEUI:
       os << "l.sfleui" << " ";
       break;
-    case 0b01010:
+    case InstructionMnemonic::L_SFGTSI:
       os << "l.sfgtsi" << " ";
       break;
-    case 0b01011:
+    case InstructionMnemonic::L_SFGESI:
       os << "l.sfgesi" << " ";
       break;
-    case 0b01100:
+    case InstructionMnemonic::L_SFLTSI:
       os << "l.sfltsi" << " ";
       break;
-    case 0b01101:
+    case InstructionMnemonic::L_SFLESI:
       os << "l.sflesi" << " ";
       break;
   }
@@ -260,35 +295,35 @@ void printFTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
 }
 void printOABRTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x39
-  switch(decoder.getOp2()) {
-    case 0b00000:
+  switch(decoder.getFunctionCode()) {
+    case InstructionMnemonic::L_SFEQ:
       os << "l.sfeq" << " ";
       break;
-    case 0b00001:
+    case InstructionMnemonic::L_SFNE:
       os << "l.sfne" << " ";
       break;
-    case 0b00010:
+    case InstructionMnemonic::L_SFGTU:
       os << "l.sfgtu" << " ";
       break;
-    case 0b00011:
+    case InstructionMnemonic::L_SFGEU:
       os << "l.sfgeu" << " ";
       break;
-    case 0b00100:
+    case InstructionMnemonic::L_SFLTU:
       os << "l.sfltu" << " ";
       break;
-    case 0b00101:
+    case InstructionMnemonic::L_SFLEU:
       os << "l.sfleu" << " ";
       break;
-    case 0b01010:
+    case InstructionMnemonic::L_SFGTS:
       os << "l.sfgts" << " ";
       break;
-    case 0b01011:
+    case InstructionMnemonic::L_SFGES:
       os << "l.sfges" << " ";
       break;
-    case 0b01100:
+    case InstructionMnemonic::L_SFLTS:
       os << "l.sflts" << " ";
       break;
-    case 0b01101:
+    case InstructionMnemonic::L_SFLES:
       os << "l.sfles" << " ";
       break;
   }
@@ -297,44 +332,44 @@ void printOABRTypeInstruction(std::ostream &os, const InstructionDecoder &decode
 }
 
 void printITypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
-  switch(decoder.getOpcode()) {
-    case 0x1A:
+  switch(decoder.getFunctionCode()) {
+    case InstructionMnemonic::L_LF:
       os << "l.lf" << " ";
       break;
-    case 0x1B:
+    case InstructionMnemonic::L_LWA:
       os << "l.lwa" << " ";
       break;
-    case 0x20:
+    case InstructionMnemonic::L_LD:
       os << "l.ld" << " ";
       break;
-    case 0x21:
+    case InstructionMnemonic::L_LWZ:
       os << "l.lwz" << " ";
       break;
-    case 0x22:
+    case InstructionMnemonic::L_LWS:
       os << "l.lws" << " ";
       break;
-    case 0x23:
+    case InstructionMnemonic::L_LBZ:
       os << "l.lbz" << " ";
       break;
-    case 0x24:
+    case InstructionMnemonic::L_LBS:
       os << "l.lbs" << " ";
       break;
-    case 0x25:
+    case InstructionMnemonic::L_LHZ:
       os << "l.lhz" << " ";
       break;
-    case 0x26:
+    case InstructionMnemonic::L_LHS:
       os << "l.lhs" << " ";
       break;
-    case 0x27:
+    case InstructionMnemonic::L_ADDI:
       os << "l.addi" << " ";
       break;
-    case 0x28:
+    case InstructionMnemonic::L_ADDIC:
       os << "l.addic" << " ";
       break;
-    case 0x2B:
+    case InstructionMnemonic::L_XORI:
       os << "l.xori" << " ";
       break;
-    case 0x2C:
+    case InstructionMnemonic::L_MULI:
       os << "l.muli" << " ";
       break;
   }
@@ -347,93 +382,82 @@ void printITypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
 
 void printRTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x38
-  switch(decoder.getOp3()) {
-    case 0b0000:
+  switch(decoder.getFunctionCode()) {
+    case InstructionMnemonic::L_ADD:
       os << "l.add" << " ";
       break;
-    case 0b0001:
+    case InstructionMnemonic::L_ADDC:
       os << "l.addc" << " ";
       break;
-    case 0b0010:
+    case InstructionMnemonic::L_SUB:
       os << "l.sub" << " ";
       break;
-    case 0b0011:
+    case InstructionMnemonic::L_AND:
       os << "l.and" << " ";
       break;
-    case 0b0100:
+    case InstructionMnemonic::L_OR:
       os << "l.or" << " ";
       break;
-    case 0b0101:
+    case InstructionMnemonic::L_XOR:
       os << "l.xor" << " ";
       break;
-    case 0b0110:
+    case InstructionMnemonic::L_MUL:
       os << "l.mul" << " ";
       break;
-    case 0b0111:
+    case InstructionMnemonic::L_MULD:
       os << "l.muld" << " ";
       break;
-    case 0b1000:
-      switch (decoder.getOp2()) {
-        case 0b0000:
-          os << "l.sll" << " ";
-          break;
-        case 0b0001:
-          os << "l.srl" << " ";
-          break;
-        case 0b0010:
-          os << "l.sra" << " ";
-          break;
-        case 0b0011:
-          os << "l.ror" << " ";
-          break;
-      }
+    case InstructionMnemonic::L_SLL:
+      os << "l.sll" << " ";
       break;
-    case 0b1001:
+    case InstructionMnemonic::L_SRL:
+      os << "l.srl" << " ";
+      break;
+    case InstructionMnemonic::L_SRA:
+      os << "l.sra" << " ";
+      break;
+    case InstructionMnemonic::L_ROR:
+      os << "l.ror" << " ";
+      break;
+    case InstructionMnemonic::L_DIV:
       os << "l.div" << " ";
       break;
-    case 0b1010:
+    case InstructionMnemonic::L_DIVU:
       os << "l.divu" << " ";
       break;
-    case 0b1011:
+    case InstructionMnemonic::L_MULU:
       os << "l.mulu" << " ";
       break;
-    case 0b1100:
-      switch (decoder.getOp2()) {
-        case 0b0000:
-          os << "l.exths" << " ";
-          break;
-        case 0b0001:
-          os << "l.extbs" << " ";
-          break;
-        case 0b0010:
-          os << "l.exthz" << " ";
-          break;
-        case 0b0011:
-          if (!((decoder.getInstructionWord() << 9) | 0b1))
-            os << "l.extbz" << " ";
-          else
-            os << "l.muldu" << " ";
-          break;
-      }
+    case InstructionMnemonic::L_EXTHS:
+      os << "l.exths" << " ";
       break;
-    case 0b1101:
-      if (decoder.getOp2() == 0b0000)
-        os << "l.extws" << " ";
-      else
-        os << "l.extwz" << " ";
+    case InstructionMnemonic::L_EXTBS:
+      os << "l.extbs" << " ";
       break;
-    case 0b1110:
+    case InstructionMnemonic::L_EXTHZ:
+      os << "l.exthz" << " ";
+      break;
+    case InstructionMnemonic::L_EXTBZ:
+      os << "l.extbz" << " ";
+      break;
+    case InstructionMnemonic::L_MULDU:
+      os << "l.muldu" << " ";
+      break;
+    case InstructionMnemonic::L_EXTWS:
+      os << "l.extws" << " ";
+      break;
+    case InstructionMnemonic::L_EXTWZ:
+      os << "l.extwz" << " "; 
+      break;
+    case InstructionMnemonic::L_CMOV:
       os << "l.cmov" << " ";
       break;
-    case 0b1111:
-      switch (decoder.getOp2()) {
-        case 0b00:
-          os << "l.ff1" << " ";
-          break;
-        case 0b01:
-          os << "l.fl1" << " ";
-          break;
-      }
+    case InstructionMnemonic::L_FF1:
+      os << "l.ff1" << " ";
+      break;
+    case InstructionMnemonic::L_FL1:
+      os << "l.fl1" << " ";
+      break;
 
   }
   if (int(decoder.getB()) != FIELD_NOT_AVAILABLE_8_BIT)
