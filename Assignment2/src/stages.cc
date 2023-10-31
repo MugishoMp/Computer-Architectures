@@ -18,7 +18,12 @@ InstructionFetchStage::propagate()
 {
   try
     {
-      /* TODO: implement instruction fetch from instruction memory. */
+      // This is done by sending the PC to the instruction memory setAddress line
+      instructionMemory.setAddress(PC);
+      // and setting the size to 4 bytes, as OpenRISC instructions are 32 bits in size.
+      instructionMemory.setSize(4);
+      // at the same time the program counter is incremented by 4
+      PC += 4;
 
 #if 0
       /* Enable this once you have implemented instruction fetch. */
@@ -40,7 +45,11 @@ void
 InstructionFetchStage::clockPulse()
 {
   /* TODO: write necessary fields in pipeline register */
+  // the new sequential pc is ledged into the pc register
   if_id.PC = PC;
+  // Also pass the instruction word to the next stage through the pipeline register.
+  // Subsequently, the instruction can be loaded by reading the value lines. 
+  if_id.INSTRUCTION_WORD = instructionMemory.getValue();
 }
 
 /*
@@ -55,12 +64,47 @@ void
 InstructionDecodeStage::propagate()
 {
   /* TODO: set instruction word on the instruction decoder */
-
-  /* TODO: need a control signals class that generates control
-   * signals from a given opcode and function code.
-   */
+  /* TODO: register fetch and other matters */
+  /* TODO: perhaps also determine and write the new PC here? */
 
   PC = if_id.PC;
+  
+  // while the instruction stored in the IF/ID pipeline register is being
+  // decoded in the control unit, which for simplicitly is not shown in 
+  // the block diagram
+  decoder.setInstructionWord(if_id.INSTRUCTION_WORD);
+
+
+  // the registers RS and RT are read from the regsiter file in case we need them
+  try {
+    regfile.setRS1(decoder.getA());
+  } catch (IllegalInstruction &e) {
+    // the field RS uses brace initiazliation so it will be zero-initialized
+    // but we really want to distinguish that RS1 is not a register
+    regfile.setRS1(MaxRegs);
+  }
+  try {
+    regfile.setRS2(decoder.getB());
+  } catch (IllegalInstruction &e) {
+    // same case here
+    regfile.setRS1(MaxRegs);
+  }
+
+  
+
+
+  try {
+    regfile.setRD(decoder.getD());
+  } catch (IllegalInstruction &e) {}
+
+
+  // try {
+  //   regfile.setWriteData(0);
+  // } catch (IllegalInstruction &e) {}
+
+  // try {
+  //   regfile.setWriteEnable(0); 
+  // } catch (IllegalInstruction &e) {}
 
 
   /* debug mode: dump decoded instructions to cerr.
@@ -81,8 +125,8 @@ InstructionDecodeStage::propagate()
       std::cerr << decoder << std::endl;
     }
 
-  /* TODO: register fetch and other matters */
-  /* TODO: perhaps also determine and write the new PC here? */
+
+
 }
 
 void InstructionDecodeStage::clockPulse()
@@ -93,6 +137,19 @@ void InstructionDecodeStage::clockPulse()
 
   /* TODO: write necessary fields in pipeline register */
   id_ex.PC = PC;
+
+  // the registers RS and RT are read from the regsiter file in 
+  // case we need them and stored in the ID/EX pipeline register
+  id_ex.RS = regfile.getReadData1();
+  id_ex.RT = regfile.getReadData2();
+
+  // the 16-bit immediate encoded in the instruction is peculiartively sign extended to
+  // 32 bits
+
+  // the destination register RD and the the next sequential register PC are passed to
+  // the ID/EX pipeline register because they are needed in later stages 
+  id_ex.RD = decoder.getD();
+  id_ex.IMMEDIATE = decoder.getImmediateI();
 }
 
 /*

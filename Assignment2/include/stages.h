@@ -27,6 +27,7 @@ struct IF_IDRegisters
   MemAddress PC = 0;
 
   /* TODO: add necessary fields */
+  RegValue INSTRUCTION_WORD = 0;
 };
 
 struct ID_EXRegisters
@@ -34,6 +35,10 @@ struct ID_EXRegisters
   MemAddress PC{};
 
   /* TODO: add necessary fields */
+  RegValue RS;
+  RegValue RT;
+  RegValue RD;
+  RegValue IMMEDIATE;
 };
 
 struct EX_MRegisters
@@ -178,6 +183,8 @@ class InstructionDecodeStage : public Stage
 
     MemAddress PC{};
     /* TODO: add other necessary fields/buffers. */
+
+    // ControlSignals &controlSignals;
 };
 
 /*

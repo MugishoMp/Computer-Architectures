@@ -53,6 +53,9 @@ void
 DataMemory::setSize(const uint8_t size)
 {
   /* TODO: check validity of size argument */
+  // check if not 2 0r 4 throw illefgal access excecption
+    // throw IllegalAccess("Invalid size " + std::to_string(size));
+    
 
   this->size = size;
 }
@@ -84,13 +87,31 @@ DataMemory::setWriteEnable(bool setting)
 RegValue
 DataMemory::getDataOut(bool signExtend) const
 {
-  /* TODO: implement */
+  if (this->size == 1 && this->readEnable){
+    if (!signExtend) return this->bus.readByte(this->addr);
+    else return (uint32_t)(int32_t)this->bus.readByte(this->addr);
 
-  return 0;
+  }  else if (this->size == 2 && this->readEnable){
+    if (!signExtend) return this->bus.readHalfWord(this->addr);
+    else return (uint32_t)(int32_t)this->bus.readHalfWord(this->addr);
+
+  } else if (this->size == 4 && this->readEnable){
+    if (!signExtend) return this->bus.readWord(this->addr);
+    else return (uint32_t)(int32_t)this->bus.readWord(this->addr);
+
+  }
+  else return 0;
 }
 
-void
-DataMemory::clockPulse() const
-{
-  /* TODO: implement. Write the actual value to memory when required. */
+void 
+DataMemory::clockPulse() const {
+
+  if (this->size == 1 && this->writeEnable)
+    this->bus.writeByte(this->addr, static_cast<uint8_t>(this->dataIn));
+
+  else if (this->size == 4 && this->writeEnable)
+    this->bus.writeHalfWord(this->addr, static_cast<uint16_t>(this->dataIn));
+  
+  else if (this->size == 4 && this->writeEnable)
+    this->bus.writeWord(this->addr, this->dataIn);
 }
