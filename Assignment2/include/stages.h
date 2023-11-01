@@ -12,6 +12,7 @@
 #include "mux.h"
 #include "inst-decoder.h"
 #include "memory-control.h"
+#include "control-signals.h"
 
 
 
@@ -27,7 +28,7 @@ struct IF_IDRegisters
   MemAddress PC = 0;
 
   /* TODO: add necessary fields */
-  RegValue INSTRUCTION_WORD = 0;
+  RegValue INSTRUCTION_WORD{};
 };
 
 struct ID_EXRegisters
@@ -35,10 +36,11 @@ struct ID_EXRegisters
   MemAddress PC{};
 
   /* TODO: add necessary fields */
-  RegValue RS;
-  RegValue RT;
-  RegValue RD;
-  RegValue IMMEDIATE;
+  RegNumber RS1{};
+  RegNumber RS2{};
+  RegNumber RD{};
+  RegValue IMMEDIATE{};
+  ControlSignals CONTROL_SIGNALS;
 };
 
 struct EX_MRegisters
@@ -46,6 +48,12 @@ struct EX_MRegisters
   MemAddress PC{};
 
   /* TODO: add necessary fields */
+  ControlSignals CONTROL_SIGNALS;
+  // zero? output
+  // ALU output
+  RegValue ALU_OUTPUT{};
+  RegNumber RS2{};
+  RegNumber RD{};
 };
 
 struct M_WBRegisters
@@ -53,6 +61,8 @@ struct M_WBRegisters
   MemAddress PC{};
 
   /* TODO: add necessary fields */
+  ControlSignals CONTROL_SIGNALS;
+  RegNumber RD{};
 };
 
 
@@ -183,8 +193,8 @@ class InstructionDecodeStage : public Stage
 
     MemAddress PC{};
     /* TODO: add other necessary fields/buffers. */
-
-    // ControlSignals &controlSignals;
+    RegValue signExtendedImmediate;
+    ControlSignals controlSignals;
 };
 
 /*
@@ -210,6 +220,9 @@ class ExecuteStage : public Stage
 
     MemAddress PC{};
     /* TODO: add other necessary fields/buffers and components (ALU anyone?) */
+    ALU alu;
+    RegNumber RS2{};
+    RegNumber RD{};
 };
 
 /*

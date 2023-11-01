@@ -6,7 +6,7 @@
  */
 
 #include "stages.h"
-
+#include "mux.h"
 #include <iostream>
 
 /*
@@ -52,6 +52,10 @@ InstructionFetchStage::clockPulse()
   if_id.INSTRUCTION_WORD = instructionMemory.getValue();
 }
 
+
+
+
+
 /*
  * Instruction decode
  */
@@ -67,45 +71,35 @@ InstructionDecodeStage::propagate()
   /* TODO: register fetch and other matters */
   /* TODO: perhaps also determine and write the new PC here? */
 
-  PC = if_id.PC;
   
-  // while the instruction stored in the IF/ID pipeline register is being
-  // decoded in the control unit, which for simplicitly is not shown in 
-  // the block diagram
   decoder.setInstructionWord(if_id.INSTRUCTION_WORD);
-
+  controlSignals.setOpcode(decoder.getOpcode());
+  controlSignals.setFunctionCode(decoder.getFunctionCode());
 
   // the registers RS and RT are read from the regsiter file in case we need them
   try {
     regfile.setRS1(decoder.getA());
   } catch (IllegalInstruction &e) {
-    // the field RS uses brace initiazliation so it will be zero-initialized
-    // but we really want to distinguish that RS1 is not a register
     regfile.setRS1(MaxRegs);
+    // the control signal rs1Input needs to return false;
   }
   try {
     regfile.setRS2(decoder.getB());
   } catch (IllegalInstruction &e) {
-    // same case here
     regfile.setRS1(MaxRegs);
+    // the control signal rs2Input needs to return false;
   }
 
-  
-
-
   try {
-    regfile.setRD(decoder.getD());
-  } catch (IllegalInstruction &e) {}
+    signExtendedImmediate = decoder.getImmediate();
+  } catch (IllegalInstruction &e) {
+    signExtendedImmediate = 0;
+    // the control signal immediateInput needs to return false;
+  }
 
-
-  // try {
-  //   regfile.setWriteData(0);
-  // } catch (IllegalInstruction &e) {}
-
-  // try {
-  //   regfile.setWriteEnable(0); 
-  // } catch (IllegalInstruction &e) {}
-
+  // decoder d field
+  
+  PC = if_id.PC;
 
   /* debug mode: dump decoded instructions to cerr.
    * In case of no pipelining: always dump.
@@ -135,22 +129,27 @@ void InstructionDecodeStage::clockPulse()
   if (! pipelining || (pipelining && PC != 0x0))
     ++nInstrIssued;
 
-  /* TODO: write necessary fields in pipeline register */
-  id_ex.PC = PC;
-
   // the registers RS and RT are read from the regsiter file in 
   // case we need them and stored in the ID/EX pipeline register
-  id_ex.RS = regfile.getReadData1();
-  id_ex.RT = regfile.getReadData2();
+  id_ex.RS1 = regfile.getReadData1();
+  id_ex.RS2 = regfile.getReadData2();
 
   // the 16-bit immediate encoded in the instruction is peculiartively sign extended to
   // 32 bits
+  id_ex.IMMEDIATE = signExtendedImmediate;
 
   // the destination register RD and the the next sequential register PC are passed to
   // the ID/EX pipeline register because they are needed in later stages 
   id_ex.RD = decoder.getD();
-  id_ex.IMMEDIATE = decoder.getImmediateI();
+  id_ex.PC = PC;
+
+  
+  // id_ex.CONTROL_SIGNALS = controlSignals;
+
 }
+
+
+
 
 /*
  * Execute
@@ -165,6 +164,32 @@ ExecuteStage::propagate()
    */
 
   PC = id_ex.PC;
+
+  id_ex.RS1;
+
+  //myMultiplexer.setInput()
+  // mux 1
+  Mux<RegValue, InputSelector> mux1;
+  mux1.setInput(InputSelector::InputOne, id_ex.PC);
+  mux1.setInput(InputSelector::InputTwo, id_ex.RS1);
+  mux1.setSelector(id_ex.CONTROL_SIGNALS.AInput());
+  
+
+  
+  // mux 1
+  Mux<RegValue, InputSelector> mux2;
+  mux2.setInput(InputSelector::InputOne, id_ex.RS2);
+  mux2.setInput(InputSelector::InputTwo, id_ex.IMMEDIATE);
+  mux2.setSelector(id_ex.CONTROL_SIGNALS.BInput());
+
+  //ALU operation
+  alu.setA(mux1.getOutput());
+  alu.setB(mux2.getOutput());
+
+  alu.setOp(id_ex.CONTROL_SIGNALS.ALUOp());
+
+  RS2 = id_ex.RS2;
+  RD = id_ex.RD;
 }
 
 void
@@ -176,6 +201,14 @@ ExecuteStage::clockPulse()
    */
 
   ex_m.PC = PC;
+
+  // zero? result
+
+  // ALU result
+  ex_m.ALU_OUTPUT = alu.getResult();
+
+  ex_m.RS2 = RS2;
+  ex_m.RD = RD;
 }
 
 /*

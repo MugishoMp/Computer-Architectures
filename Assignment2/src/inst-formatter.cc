@@ -471,11 +471,6 @@ void printRTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
 std::ostream &
 operator<<(std::ostream &os, const InstructionDecoder &decoder)
 {
-  /* TODO: write a textual representation of the decoded instruction
-   * in "decoder" to the output stream "os". Do not include a newline.
-   * And remove the statement below.
-   */
-
   switch (decoder.getInstructionType()) {
     case R:
       printRTypeInstruction(os, decoder);

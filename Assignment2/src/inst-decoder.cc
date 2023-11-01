@@ -29,7 +29,6 @@ InstructionDecoder::getInstructionWord() const
   return instructionWord;
 }
 
-// TODO: create helper function
 InstructionType
 InstructionDecoder::getInstructionType() const
 {
@@ -322,7 +321,41 @@ InstructionDecoder::getImmediateN() const
   return immediateN;  /* result undefined */
 }
 
-// TODO: create helper function
+// can be a negative number
+int32_t
+InstructionDecoder::getImmediate() const
+{
+  int32_t immediate = FIELD_NOT_AVAILABLE_32_BIT;
+
+  switch (getInstructionType()) {
+    case I:
+    case F:
+    case S:
+      immediate = static_cast<int32_t>(getImmediateI());
+      break;
+    case J:
+    case DN:
+      immediate = static_cast<int32_t>(getImmediateN());
+      break;
+    // case DABLK:
+    case ORK:
+    case DROK:
+    case OK:
+    case DAK:
+    case KABK:
+      immediate = static_cast<int32_t>(getK());
+      break;
+    case SH:
+    // case DABLK:
+      immediate = static_cast<int32_t>(getL());
+      break;
+    default:
+      throw IllegalInstruction("Immediate N field not available for this instruction type");
+  }
+
+  return immediate;  /* result undefined */
+}
+
 int32_t
 InstructionDecoder::getReserved() const
 {
@@ -426,7 +459,6 @@ InstructionDecoder::getK() const
       K = (((getInstructionWord() & BITS_25_21) >> 21) << 11) | ((getInstructionWord() & BITS_10_0));
       break;
     default:
-      K = FIELD_NOT_AVAILABLE_32_BIT;
       throw IllegalInstruction("K field not available for this instruction type");
   }
 

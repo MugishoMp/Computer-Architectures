@@ -14,9 +14,37 @@
 #include <map>
 
 enum class ALUOp {
-    NOP,
+    NOP,  // No operation
 
-    /* TODO: add other operations as necessary */
+    // Arithmetic Operations
+    ADD,  // Addition
+    SUB,  // Subtraction
+    MUL,  // Multiplication
+    DIV,  // Division
+    MOD,  // Modulus
+
+    // Logical Operations
+    AND,  // Bitwise AND
+    OR,   // Bitwise OR
+    XOR,  // Bitwise XOR
+    NOT,  // Bitwise NOT
+
+    // Shift Operations
+    SHL,  // Shift Left
+    SHR,  // Shift Right (Logical)
+    SAR,  // Shift Right (Arithmetic)
+
+    // Comparison Operations
+    EQ,   // Equal
+    NEQ,  // Not Equal
+    LT,   // Less Than
+    LTE,  // Less Than or Equal
+    GT,   // Greater Than
+    GTE,  // Greater Than or Equal
+
+    // Other Operations
+    INC,  // Increment
+    DEC   // Decrement
 };
 
 

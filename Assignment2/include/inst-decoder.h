@@ -17,8 +17,6 @@
 
 static const int INSTRUCTION_SIZE = 4;
 
-/* TODO: add enums and constants necessary for your instruction decoder. */
-
 
 /* Exception that should be thrown when an illegal instruction
  * is encountered.
@@ -121,7 +119,7 @@ class InstructionDecoder
     RegNumber getD() const;
 
     /**
-     * Get the immediate value.
+     * Get the immediate I value.
      * @brief gets the bits at the bit positions 15-0
      * in the case of a I or F type instruction or the bits
      * 10-0 in the case of an S type instruction
@@ -130,12 +128,21 @@ class InstructionDecoder
     int16_t getImmediateI() const;
 
     /**
-     * Get the immediate value.
+     * Get the immediate N value.
      * @brief gets the bits at the bit positions 25-0
      * in the case of a J type instruction 
      * @return The immediate N.
      */
     int32_t getImmediateN() const;
+
+    
+    /**
+     * Get the immediate value.
+     * @brief gets either the immediate I or N value and sign extends this value
+     *        so that it fits 32 bits
+     * @return The immediate N.
+     */
+    int32_t getImmediate() const;
 
     /**
      * Get the reserved field of the instruction.

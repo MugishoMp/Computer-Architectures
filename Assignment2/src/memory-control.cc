@@ -52,10 +52,9 @@ DataMemory::DataMemory(MemoryBus &bus)
 void
 DataMemory::setSize(const uint8_t size)
 {
-  /* TODO: check validity of size argument */
   // check if not 2 0r 4 throw illefgal access excecption
-    // throw IllegalAccess("Invalid size " + std::to_string(size));
-    
+  if (size != 2 && size != 4)
+    throw IllegalAccess("Invalid size " + std::to_string(size));
 
   this->size = size;
 }
@@ -109,7 +108,7 @@ DataMemory::clockPulse() const {
   if (this->size == 1 && this->writeEnable)
     this->bus.writeByte(this->addr, static_cast<uint8_t>(this->dataIn));
 
-  else if (this->size == 4 && this->writeEnable)
+  else if (this->size == 2 && this->writeEnable)
     this->bus.writeHalfWord(this->addr, static_cast<uint16_t>(this->dataIn));
   
   else if (this->size == 4 && this->writeEnable)

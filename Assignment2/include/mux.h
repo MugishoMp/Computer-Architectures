@@ -42,6 +42,7 @@
  *        LAST
  *     };
  */
+
 template <typename V, typename S>
 class Mux
 {
