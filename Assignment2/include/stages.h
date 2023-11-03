@@ -36,8 +36,8 @@ struct ID_EXRegisters
   MemAddress PC{};
 
   /* TODO: add necessary fields */
-  RegNumber RS1{};
-  RegNumber RS2{};
+  RegValue RS1{};
+  RegValue RS2{};
   RegNumber RD{};
   RegValue IMMEDIATE{};
   ControlSignals CONTROL_SIGNALS;
@@ -52,7 +52,7 @@ struct EX_MRegisters
   // zero? output
   // ALU output
   RegValue ALU_OUTPUT{};
-  RegNumber RS2{};
+  RegValue RS2{};
   RegNumber RD{};
 
   RegValue BRANCH_PC{};
@@ -65,6 +65,8 @@ struct M_WBRegisters
 
   /* TODO: add necessary fields */
   ControlSignals CONTROL_SIGNALS;
+  RegValue DATA_READ_FROM_MEMORY{};
+  RegValue ALU_RESULT{};
   RegNumber RD{};
 };
 
@@ -260,6 +262,8 @@ class MemoryStage : public Stage
 
     MemAddress PC{};
     /* TODO: add other necessary fields/buffers */
+    RegValue DATA_READ_FROM_MEMORY{};
+    RegValue ALU_RESULT{};
     RegNumber RD{};
 };
 

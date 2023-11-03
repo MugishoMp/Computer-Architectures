@@ -263,23 +263,24 @@ MemoryStage::propagate()
 
   PC = ex_m.PC;
 
-  ex_m.ALU_OUTPUT;
+  RegValue EFFECTIVE_ADDRESS = ex_m.ALU_OUTPUT;
   
-  ex_m.RS2;
-  
-  ex_m.ALU_OUTPUT;
+  RegValue DATA = ex_m.RS2;
 
-  // if the outcome of the zero test in the previous cycle is true indicating 
-  // that the branch would be taken the multiplexer does not select PC+4 as 
-  // the next program counter but the branch targtet address which has been 
-  // computed by the ALU in the previous stage
-  BRANCH_TARGET_ADDRESS = ex_m.ALU_OUTPUT;
+  dataMemory.setDataIn(DATA);
+  dataMemory.setAddress(EFFECTIVE_ADDRESS);
 
-  // in fact we also need to solder the output of the multiplexer to the pc register
-  // but for simplicity this has been ommited in this diagram
+  // size of the data, so either 1, 2 or 4 bytes
+  dataMemory.setSize(ex_m.CONTROL_SIGNALS.getDataSize());
 
-  // if the instruction is an R-type instruction such as and ADD or an SUBTRACT
-  // the ALU result is simply routed around the datamemor
+  //read
+  dataMemory.setReadEnable(ex_m.CONTROL_SIGNALS.isReadOp());
+  DATA_READ_FROM_MEMORY = dataMemory.getDataOut(false);
+
+  //write
+  dataMemory.setWriteEnable(ex_m.CONTROL_SIGNALS.isWriteOp());
+  dataMemory.clockPulse();
+
   ALU_RESULT = ex_m.ALU_OUTPUT;
 
   // RD
@@ -293,7 +294,16 @@ MemoryStage::clockPulse()
 
   /* TODO: write necessary fields in pipeline register */
 
+
   m_wb.PC = PC;
+
+  m_wb.DATA_READ_FROM_MEMORY = DATA_READ_FROM_MEMORY;
+
+  // OUTPUT Data Memory
+  m_wb.ALU_RESULT = ALU_RESULT;
+
+  // OUTPUT RD
+  m_wb.RD = RD;
 }
 
 /*
@@ -314,13 +324,16 @@ WriteBackStage::propagate()
   // INPUT 1 Mux - m_wb.AAAAAA
   // INPUT 2 Mux - m_wb.BBBBBB
   // OUTPUT Mux - mux.getOutput();
-  Mux<RegValue, InputSelectorIFStage> mux;
-  mux.setInput(InputSelectorIFStage::InputOne, m_wb.AAAAAA);
-  mux.setInput(InputSelectorIFStage::InputTwo, m_wb.BBBBBB);
-  mux.setSelector(controlSignals.X());
+  Mux<RegValue, InputSelectorWBStage> mux;
+  mux.setInput(InputSelectorWBStage::InputOne, m_wb.DATA_READ_FROM_MEMORY);
+  mux.setInput(InputSelectorWBStage::InputTwo, m_wb.ALU_RESULT);
+  // TODO control signal
+  mux.setSelector(m_wb.CONTROL_SIGNALS.isReadOp());
+
   // Registers INPUT 4(is is RegValue BTW!!!!)
   regfile.setWriteData(mux.getOutput());
-  regfile.setWriteEnable(controlSignals.regWriteInput());
+  // TODO control signal
+  regfile.setWriteEnable(m_wb.CONTROL_SIGNALS.isWriteOp());
 
 }
 
@@ -328,4 +341,5 @@ void
 WriteBackStage::clockPulse()
 {
   /* TODO: pulse the register file */
+  regfile.clockPulse();
 }
