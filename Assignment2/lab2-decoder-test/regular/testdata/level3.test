@@ -1,0 +1,23 @@
+-X testdata/level3-instrs.txt
+0x00000000	l.j 0
+0x00000002	l.j 8
+0x00000409	l.j 4132
+0xe5a93800	l.sf les r9, r7
+0xe5a05000	l.sf les r0, r10
+0xe5b50000	l.sf les r21, r0
+0xe5693800	l.sf ges r9, r7
+0xe5605000	l.sf ges r0, r10
+0xe5750000	l.sf ges r21, r0
+0xe4293800	l.sf ne r9, r7
+0xe4205000	l.sf ne r0, r10
+0xe4350000	l.sf ne r21, r0
+0x10000000	l.bf 0
+0x10000002	l.bf 8
+0x10000409	l.bf 4132
+0xe0273800	l.add r1, r7, r7
+0xe01e0000	l.add r0, r30, r0
+0xe2bd0000	l.add r21, r29, r0
+0x8e54ffe8	l.lbz r18, -24(r20)
+0x8eb4ff80	l.lbz r21, -128(r20)
+0x8c2b0009	l.lbz r1, 9(r11)
+0x8d000078	l.lbz r8, 120(r0)

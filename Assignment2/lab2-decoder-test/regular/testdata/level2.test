@@ -1,0 +1,29 @@
+-X testdata/level2-instrs.txt
+0x9c64ffef	l.addi r3, r4, $-17
+0x9c0b0064	l.addi r0, r11, $100
+0x9c20ffff	l.addi r1, r0, $-1
+0x9eb50015	l.addi r21, r21, $21
+0x9efe001e	l.addi r23, r30, $30
+0x04000000	l.jal 0
+0x04000040	l.jal 256
+0x04048d04	l.jal 1192976
+0x8654ffe8	l.lwz r18, -24(r20)
+0x86b4ff80	l.lwz r21, -128(r20)
+0x842b0009	l.lwz r1, 9(r11)
+0x85000078	l.lwz r8, 120(r0)
+0xa82a006c	l.ori r1, r10, $108
+0xa80b0001	l.ori r0, r11, $1
+0xabce0457	l.ori r30, r14, $1111
+0xe0273804	l.or r1, r7, r7
+0xe01e0004	l.or r0, r30, r0
+0xe2bd0004	l.or r21, r29, r0
+0xe0273808	l.sll r1, r7, r7
+0xe01e0008	l.sll r0, r30, r0
+0xe2bd0008	l.sll r21, r29, r0
+0xe2319888	l.sra r17, r17, r19
+0xe01e0088	l.sra r0, r30, r0
+0xe2bd0088	l.sra r21, r29, r0
+0xd4110800	l.sw r1, 0(r17)
+0xd4018804	l.sw r17, 4(r1)
+0xd4002014	l.sw r4, 20(r0)
+0xd7fcf7fc	l.sw r30, -4(r28)

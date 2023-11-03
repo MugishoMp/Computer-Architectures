@@ -54,6 +54,9 @@ struct EX_MRegisters
   RegValue ALU_OUTPUT{};
   RegNumber RS2{};
   RegNumber RD{};
+
+  RegValue BRANCH_PC{};
+  InputSelectorIFStage BRANCH_DECISION{};
 };
 
 struct M_WBRegisters
@@ -135,10 +138,12 @@ class InstructionFetchStage : public Stage
 {
   public:
     InstructionFetchStage(bool pipelining,
+                          const EX_MRegisters &ex_m,
                           IF_IDRegisters &if_id,
                           InstructionMemory instructionMemory,
                           MemAddress &PC)
       : Stage(pipelining),
+      ex_m(ex_m),
       if_id(if_id),
       instructionMemory(instructionMemory),
       PC(PC)
@@ -148,6 +153,7 @@ class InstructionFetchStage : public Stage
     void clockPulse() override;
 
   private:
+    const EX_MRegisters &ex_m;
     IF_IDRegisters &if_id;
 
     InstructionMemory instructionMemory;
@@ -163,6 +169,7 @@ class InstructionDecodeStage : public Stage
   public:
     InstructionDecodeStage(bool pipelining,
                            const IF_IDRegisters &if_id,
+                           const M_WBRegisters &m_wb,
                            ID_EXRegisters &id_ex,
                            RegisterFile &regfile,
                            InstructionDecoder &decoder,
@@ -170,7 +177,7 @@ class InstructionDecodeStage : public Stage
                            uint64_t &nStalls,
                            bool debugMode = false)
       : Stage(pipelining),
-      if_id(if_id), id_ex(id_ex),
+      if_id(if_id), id_ex(id_ex), m_wb(m_wb),
       regfile(regfile), decoder(decoder),
       nInstrIssued(nInstrIssued), nStalls(nStalls),
       debugMode(debugMode)
@@ -181,6 +188,7 @@ class InstructionDecodeStage : public Stage
 
   private:
     const IF_IDRegisters &if_id;
+    const M_WBRegisters &m_wb;
     ID_EXRegisters &id_ex;
 
     RegisterFile &regfile;
@@ -223,6 +231,7 @@ class ExecuteStage : public Stage
     ALU alu;
     RegNumber RS2{};
     RegNumber RD{};
+    InputSelectorIFStage EQUALITY_TEST{};
 };
 
 /*
@@ -251,6 +260,7 @@ class MemoryStage : public Stage
 
     MemAddress PC{};
     /* TODO: add other necessary fields/buffers */
+    RegNumber RD{};
 };
 
 /*

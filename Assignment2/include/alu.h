@@ -13,6 +13,7 @@
 
 #include <map>
 
+// Define the operations
 enum class ALUOp {
     NOP,  // No operation
 
@@ -47,6 +48,14 @@ enum class ALUOp {
     DEC   // Decrement
 };
 
+// Define the flags
+enum class ALUFlags {
+    Zero,    // Set if the result is zero
+    Sign,    // Set if the result is negative
+    Carry,   // Set if there is a carry out
+    Overflow // Set if there is an overflow
+};
+
 
 /* The ALU component performs the specified operation on operands A and B
  * when asked to propagate the result. The operation is specified through
@@ -59,16 +68,30 @@ class ALU
 
     void setA(RegValue A) { this->A = A; }
     void setB(RegValue B) { this->B = B; }
+    void setOp(ALUOp op) { this->op = op; }
 
     RegValue getResult();
 
-    void setOp(ALUOp op) { this->op = op; }
+    // Methods to retrieve the status of the flags
+    bool getZeroFlag() const { return zeroFlag; }
+    bool getSignFlag() const { return signFlag; }
+    bool getCarryFlag() const { return carryFlag; }
+    bool getOverflowFlag() const { return overflowFlag; }
 
   private:
     RegValue A;
     RegValue B;
 
     ALUOp op;
+
+    // Flags
+    bool zeroFlag = false;
+    bool signFlag = false;
+    bool carryFlag = false;
+    bool overflowFlag = false;
+    
+    // Method to update flags
+    void updateFlags(RegValue result);
 };
 
 #endif /* __ALU_H__ */

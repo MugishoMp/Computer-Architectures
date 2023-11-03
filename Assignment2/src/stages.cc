@@ -18,12 +18,27 @@ InstructionFetchStage::propagate()
 {
   try
     {
-      // This is done by sending the PC to the instruction memory setAddress line
+      // INPUT ADD - PC + 4
+      // OUTPUT ADD - NEXT_PC
+      MemAddress NEXT_PC = PC + 4;
+
+      // INPUT Mux - ex_m.BRANCH_DECISION
+      // INPUT Mux - ex_m.BRANCH_PC
+      // INPUT Mux - NEXT_PC
+      // OUTPUT Mux - mux.getOutput();
+      Mux<RegValue, InputSelectorIFStage> mux;
+      mux.setInput(InputSelectorIFStage::InputOne, ex_m.BRANCH_PC);
+      mux.setInput(InputSelectorIFStage::InputTwo, NEXT_PC);
+      mux.setSelector(ex_m.BRANCH_DECISION);
+
+      // INPUT Instruction Memory - PC
       instructionMemory.setAddress(PC);
-      // and setting the size to 4 bytes, as OpenRISC instructions are 32 bits in size.
       instructionMemory.setSize(4);
-      // at the same time the program counter is incremented by 4
-      PC += 4;
+
+      // INPUT PC - mux.getOutput();
+      // OUTPUT PC - PC
+      PC = mux.getOutput();
+      
 
 #if 0
       /* Enable this once you have implemented instruction fetch. */
@@ -44,11 +59,10 @@ InstructionFetchStage::propagate()
 void
 InstructionFetchStage::clockPulse()
 {
-  /* TODO: write necessary fields in pipeline register */
-  // the new sequential pc is ledged into the pc register
+  // OUTPUT Mux - mux.getOutput();
   if_id.PC = PC;
-  // Also pass the instruction word to the next stage through the pipeline register.
-  // Subsequently, the instruction can be loaded by reading the value lines. 
+  
+  // OUTPUT Instruction Memory
   if_id.INSTRUCTION_WORD = instructionMemory.getValue();
 }
 
@@ -67,22 +81,25 @@ dump_instruction(std::ostream &os, const uint32_t instructionWord,
 void
 InstructionDecodeStage::propagate()
 {
-  /* TODO: set instruction word on the instruction decoder */
-  /* TODO: register fetch and other matters */
-  /* TODO: perhaps also determine and write the new PC here? */
-
-  
+  // decode instruction
   decoder.setInstructionWord(if_id.INSTRUCTION_WORD);
+  // set control signals
   controlSignals.setOpcode(decoder.getOpcode());
   controlSignals.setFunctionCode(decoder.getFunctionCode());
 
-  // the registers RS and RT are read from the regsiter file in case we need them
+  // PC
+  PC = if_id.PC;
+  
+
+  // Registers INPUT 1 - decoder.getA()
   try {
     regfile.setRS1(decoder.getA());
   } catch (IllegalInstruction &e) {
     regfile.setRS1(MaxRegs);
     // the control signal rs1Input needs to return false;
   }
+
+  // Registers INPUT 2 - decoder.getB()
   try {
     regfile.setRS2(decoder.getB());
   } catch (IllegalInstruction &e) {
@@ -90,16 +107,20 @@ InstructionDecodeStage::propagate()
     // the control signal rs2Input needs to return false;
   }
 
+  // Registers INPUT 3 - m_wb.RD
+  regfile.setRD(m_wb.RD);
+
+  // Registers INPUT 4
+  // handled in the WB stage
+
+  // Sign Extend INPUT 1
   try {
     signExtendedImmediate = decoder.getImmediate();
   } catch (IllegalInstruction &e) {
     signExtendedImmediate = 0;
     // the control signal immediateInput needs to return false;
   }
-
-  // decoder d field
   
-  PC = if_id.PC;
 
   /* debug mode: dump decoded instructions to cerr.
    * In case of no pipelining: always dump.
@@ -125,27 +146,23 @@ InstructionDecodeStage::propagate()
 
 void InstructionDecodeStage::clockPulse()
 {
+  // PC
+  id_ex.PC = PC;
+  
+  // Registers OUTPUT 1
+  id_ex.RS1 = regfile.getReadData1();
+  // Registers OUTPUT 2
+  id_ex.RS2 = regfile.getReadData2();
+
+  // Sign Extend OUTPUT 1
+  id_ex.IMMEDIATE = signExtendedImmediate;
+
+  // Register RD
+  id_ex.RD = decoder.getD();
+
   /* ignore the "instruction" in the first cycle. */
   if (! pipelining || (pipelining && PC != 0x0))
     ++nInstrIssued;
-
-  // the registers RS and RT are read from the regsiter file in 
-  // case we need them and stored in the ID/EX pipeline register
-  id_ex.RS1 = regfile.getReadData1();
-  id_ex.RS2 = regfile.getReadData2();
-
-  // the 16-bit immediate encoded in the instruction is peculiartively sign extended to
-  // 32 bits
-  id_ex.IMMEDIATE = signExtendedImmediate;
-
-  // the destination register RD and the the next sequential register PC are passed to
-  // the ID/EX pipeline register because they are needed in later stages 
-  id_ex.RD = decoder.getD();
-  id_ex.PC = PC;
-
-  
-  // id_ex.CONTROL_SIGNALS = controlSignals;
-
 }
 
 
@@ -163,32 +180,49 @@ ExecuteStage::propagate()
    * Consider using the Mux class.
    */
 
+  // PC
   PC = id_ex.PC;
 
-  id_ex.RS1;
+  // INPUT FLAG TEST - id_ex.RS1 (if true switch to branch address)
+  // INPUT FLAG TEST - id_ex.RS2 (if false take next address)
+  // OUTPUT FLAG TEST EQUALITY_TEST
+  if (id_ex.RS1 == id_ex.RS2)
+    EQUALITY_TEST = InputSelectorIFStage::InputOne;
+  else
+    EQUALITY_TEST = InputSelectorIFStage::InputTwo;
 
-  //myMultiplexer.setInput()
-  // mux 1
-  Mux<RegValue, InputSelector> mux1;
-  mux1.setInput(InputSelector::InputOne, id_ex.PC);
-  mux1.setInput(InputSelector::InputTwo, id_ex.RS1);
+
+  // INPUT Mux - id_ex.PC
+  // INPUT Mux - id_ex.RS1
+  // INPUT Mux (implicit) - CONTROL_SIGNALS.AInput()
+  // OUTPUT Mux - mux.getOutput();
+  Mux<RegValue, InputSelectorEXStage> mux1;
+  mux1.setInput(InputSelectorEXStage::InputOne, id_ex.PC);
+  mux1.setInput(InputSelectorEXStage::InputTwo, id_ex.RS1);
   mux1.setSelector(id_ex.CONTROL_SIGNALS.AInput());
   
 
-  
-  // mux 1
-  Mux<RegValue, InputSelector> mux2;
-  mux2.setInput(InputSelector::InputOne, id_ex.RS2);
-  mux2.setInput(InputSelector::InputTwo, id_ex.IMMEDIATE);
+  // INPUT Mux - id_ex.RS2
+  // INPUT Mux - id_ex.IMMEDIATE
+  // INPUT Mux (implicit) - NEXT_PC
+  // OUTPUT Mux - CONTROL_SIGNALS.BInput()
+  Mux<RegValue, InputSelectorEXStage> mux2;
+  mux2.setInput(InputSelectorEXStage::InputOne, id_ex.RS2);
+  mux2.setInput(InputSelectorEXStage::InputTwo, id_ex.IMMEDIATE);
   mux2.setSelector(id_ex.CONTROL_SIGNALS.BInput());
 
-  //ALU operation
+  // INPUT ALU - mux1.getOutput()
+  // INPUT ALU - mux2.getOutput()
+  // INPUT ALU (implicit) - operation
+  // OUTPUT ALU
   alu.setA(mux1.getOutput());
   alu.setB(mux2.getOutput());
-
   alu.setOp(id_ex.CONTROL_SIGNALS.ALUOp());
 
+  // RS2
   RS2 = id_ex.RS2;
+
+  // RD
   RD = id_ex.RD;
 }
 
@@ -200,14 +234,19 @@ ExecuteStage::clockPulse()
    * the ALU computes the effective memory address.
    */
 
+  // PC
   ex_m.PC = PC;
 
-  // zero? result
+  // Equality test
+  ex_m.BRANCH_DECISION = EQUALITY_TEST;
 
-  // ALU result
+  // ALU 
   ex_m.ALU_OUTPUT = alu.getResult();
 
+  // RS2
   ex_m.RS2 = RS2;
+
+  // RD
   ex_m.RD = RD;
 }
 
@@ -223,6 +262,28 @@ MemoryStage::propagate()
    */
 
   PC = ex_m.PC;
+
+  ex_m.ALU_OUTPUT;
+  
+  ex_m.RS2;
+  
+  ex_m.ALU_OUTPUT;
+
+  // if the outcome of the zero test in the previous cycle is true indicating 
+  // that the branch would be taken the multiplexer does not select PC+4 as 
+  // the next program counter but the branch targtet address which has been 
+  // computed by the ALU in the previous stage
+  BRANCH_TARGET_ADDRESS = ex_m.ALU_OUTPUT;
+
+  // in fact we also need to solder the output of the multiplexer to the pc register
+  // but for simplicity this has been ommited in this diagram
+
+  // if the instruction is an R-type instruction such as and ADD or an SUBTRACT
+  // the ALU result is simply routed around the datamemor
+  ALU_RESULT = ex_m.ALU_OUTPUT;
+
+  // RD
+  RD = ex_m.RD;
 }
 
 void
@@ -248,6 +309,19 @@ WriteBackStage::propagate()
   /* TODO: configure write lines of register file based on control
    * signals
    */
+  
+  // INPUT (implicit) Mux - controlSignals.X()
+  // INPUT 1 Mux - m_wb.AAAAAA
+  // INPUT 2 Mux - m_wb.BBBBBB
+  // OUTPUT Mux - mux.getOutput();
+  Mux<RegValue, InputSelectorIFStage> mux;
+  mux.setInput(InputSelectorIFStage::InputOne, m_wb.AAAAAA);
+  mux.setInput(InputSelectorIFStage::InputTwo, m_wb.BBBBBB);
+  mux.setSelector(controlSignals.X());
+  // Registers INPUT 4(is is RegValue BTW!!!!)
+  regfile.setWriteData(mux.getOutput());
+  regfile.setWriteEnable(controlSignals.regWriteInput());
+
 }
 
 void

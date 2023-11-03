@@ -1,0 +1,8 @@
+-X testdata/level0-instrs.txt
+0x9c880075	l.addi r4, r8, $117
+0x9eab0010	l.addi r21, r11, $16
+0x9c0dffec	l.addi r0, r13, $-20
+0xe0a05002	l.sub r5, r0, r10
+0xe1090002	l.sub r8, r9, r0
+0xe3244002	l.sub r25, r4, r8
+0x15000000	l.nop $0

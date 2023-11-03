@@ -30,11 +30,11 @@
  * the typename of an enum that will be used as selector. This enum must
  * contain an entry "LAST" as the final item. For example:
  *
- *     Mux<RegValue, InputSelector> myMultiplexer;
+ *     Mux<RegValue, InputSelectorEXStage> myMultiplexer;
  *
- * Where InputSelector is defined as follows:
+ * Where InputSelectorEXStage is defined as follows:
  *
- *     enum class InputSelector
+ *     enum class InputSelectorEXStage
  *     {
  *        InputOne,
  *        InputTwo,

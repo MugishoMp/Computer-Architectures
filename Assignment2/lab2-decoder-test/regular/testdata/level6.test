@@ -1,0 +1,27 @@
+-X testdata/level6-instrs.txt
+0xa4880075	l.andi r4, r8, $117
+0xa6ab0010	l.andi r21, r11, $16
+0xa40dffec	l.andi r0, r13, $65516
+0x0c000000	l.bnf 0
+0x0c000002	l.bnf 8
+0x0c000409	l.bnf 4132
+0x8654ffe8	l.lwz r18, -24(r20)
+0x86b4ff80	l.lwz r21, -128(r20)
+0x842b0009	l.lwz r1, 9(r11)
+0x85000078	l.lwz r8, 120(r0)
+0xe4093800	l.sf eq r9, r7
+0xe4005000	l.sf eq r0, r10
+0xe4150000	l.sf eq r21, r0
+0xe5493800	l.sf gts r9, r7
+0xe5405000	l.sf gts r0, r10
+0xe5550000	l.sf gts r21, r0
+0xe4493800	l.sf gtu r9, r7
+0xe4405000	l.sf gtu r0, r10
+0xe4550000	l.sf gtu r21, r0
+0xe4293800	l.sf ne r9, r7
+0xe4205000	l.sf ne r0, r10
+0xe4350000	l.sf ne r21, r0
+0xdc110800	l.sh r1, 0(r17)
+0xdc018804	l.sh r17, 4(r1)
+0xdc002014	l.sh r4, 20(r0)
+0xdffcf7fc	l.sh r30, -4(r28)

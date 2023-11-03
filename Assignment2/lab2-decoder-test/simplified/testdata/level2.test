@@ -1,0 +1,29 @@
+-X testdata/level2-instrs.txt
+0x9c64ffef	op=39 I-type D=3 A=4 imm=0xffef
+0x9c0b0064	op=39 I-type D=0 A=11 imm=0x64
+0x9c20ffff	op=39 I-type D=1 A=0 imm=0xffff
+0x9eb50015	op=39 I-type D=21 A=21 imm=0x15
+0x9efe001e	op=39 I-type D=23 A=30 imm=0x1e
+0x04000000	op=1 J-type imm=0x0
+0x04000040	op=1 J-type imm=0x40
+0x04048d04	op=1 J-type imm=0x48d04
+0x8654ffe8	op=33 I-type D=18 A=20 imm=0xffe8
+0x86b4ff80	op=33 I-type D=21 A=20 imm=0xff80
+0x842b0009	op=33 I-type D=1 A=11 imm=0x9
+0x85000078	op=33 I-type D=8 A=0 imm=0x78
+0xa82a006c	op=42 U-type D=1 A=10 imm=0x6c
+0xa80b0001	op=42 U-type D=0 A=11 imm=0x1
+0xabce0457	op=42 U-type D=30 A=14 imm=0x457
+0xe0273804	op=56 R-type func=4 D=1 A=7 B=7
+0xe01e0004	op=56 R-type func=4 D=0 A=30 B=0
+0xe2bd0004	op=56 R-type func=4 D=21 A=29 B=0
+0xe0273808	op=56 R-type func=8 D=1 A=7 B=7
+0xe01e0008	op=56 R-type func=8 D=0 A=30 B=0
+0xe2bd0008	op=56 R-type func=8 D=21 A=29 B=0
+0xe2319888	op=56 R-type func=40 D=17 A=17 B=19
+0xe01e0088	op=56 R-type func=40 D=0 A=30 B=0
+0xe2bd0088	op=56 R-type func=40 D=21 A=29 B=0
+0xd4110800	op=53 S-type A=17 B=1 imm=0x0
+0xd4018804	op=53 S-type A=1 B=17 imm=0x4
+0xd4002014	op=53 S-type A=0 B=4 imm=0x14
+0xd7fcf7fc	op=53 S-type A=28 B=30 imm=0xfffc

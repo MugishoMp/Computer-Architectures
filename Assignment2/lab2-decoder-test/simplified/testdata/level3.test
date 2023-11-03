@@ -1,0 +1,23 @@
+-X testdata/level3-instrs.txt
+0x00000000	op=0 J-type imm=0x0
+0x00000002	op=0 J-type imm=0x2
+0x00000409	op=0 J-type imm=0x409
+0xe5a93800	op=57 SFR-type func=13 A=9 B=7
+0xe5a05000	op=57 SFR-type func=13 A=0 B=10
+0xe5b50000	op=57 SFR-type func=13 A=21 B=0
+0xe5693800	op=57 SFR-type func=11 A=9 B=7
+0xe5605000	op=57 SFR-type func=11 A=0 B=10
+0xe5750000	op=57 SFR-type func=11 A=21 B=0
+0xe4293800	op=57 SFR-type func=1 A=9 B=7
+0xe4205000	op=57 SFR-type func=1 A=0 B=10
+0xe4350000	op=57 SFR-type func=1 A=21 B=0
+0x10000000	op=4 J-type imm=0x0
+0x10000002	op=4 J-type imm=0x2
+0x10000409	op=4 J-type imm=0x409
+0xe0273800	op=56 R-type func=0 D=1 A=7 B=7
+0xe01e0000	op=56 R-type func=0 D=0 A=30 B=0
+0xe2bd0000	op=56 R-type func=0 D=21 A=29 B=0
+0x8e54ffe8	op=35 I-type D=18 A=20 imm=0xffe8
+0x8eb4ff80	op=35 I-type D=21 A=20 imm=0xff80
+0x8c2b0009	op=35 I-type D=1 A=11 imm=0x9
+0x8d000078	op=35 I-type D=8 A=0 imm=0x78

@@ -1,0 +1,15 @@
+-X testdata/level1-instrs.txt
+0xaa20019c	op=42 U-type D=17 A=0 imm=0x19c
+0xa80801ff	op=42 U-type D=0 A=8 imm=0x1ff
+0xa834000a	op=42 U-type D=1 A=20 imm=0xa
+0xaa990000	op=42 U-type D=20 A=25 imm=0x0
+0xd8110800	op=54 S-type A=17 B=1 imm=0x0
+0xd8018804	op=54 S-type A=1 B=17 imm=0x4
+0xd8002014	op=54 S-type A=0 B=4 imm=0x14
+0xdbfcf7fc	op=54 S-type A=28 B=30 imm=0xfffc
+0x19600000	op=6 I-type D=11 A=0 imm=0x0
+0x182000bc	op=6 I-type D=1 A=0 imm=0xbc
+0x1aa005f5	op=6 I-type D=21 A=0 imm=0x5f5
+0x44004000	op=17 R-type func=0 D=0 A=0 B=8
+0x44000800	op=17 R-type func=0 D=0 A=0 B=1
+0x4400a000	op=17 R-type func=0 D=0 A=0 B=20

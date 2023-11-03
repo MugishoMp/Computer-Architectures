@@ -121,10 +121,24 @@ ALU::getResult()
         case ALUOp::DEC:
             result = A - 1;
             break;
-
-        default:
-            throw IllegalInstruction("Unimplemented or unknown ALU operation");
     }
 
+    // After the result is set, call updateFlags
+    updateFlags(result);
+
     return result;
+}
+
+// Define the updateFlags method
+void ALU::updateFlags(RegValue result)
+{
+    // Zero flag
+    zeroFlag = (result == 0);
+
+    // Sign flag (assuming RegValue is a signed type)
+    signFlag = (result < 0);
+
+    // Carry and Overflow flags would depend on the operation and would need to be
+    // updated accordingly, possibly using additional information from the operation
+    // (e.g., did an addition result in a carry?).
 }

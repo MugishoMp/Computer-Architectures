@@ -2,8 +2,29 @@
 #include "inst-decoder-enums.h"
 #include "alu.h"
 
+enum class InputSelectorIFStage
+{
+  InputOne,
+  InputTwo,
+  LAST
+};
 
-enum class InputSelector
+enum class InputSelectorEXStage
+{
+  InputOne,
+  InputTwo,
+  LAST
+};
+
+enum class InputSelectorMEMStage
+{
+  InputOne,
+  InputTwo,
+  InputTree,
+  LAST
+};
+
+enum class InputSelectorWBStage
 {
   InputOne,
   InputTwo,
@@ -19,8 +40,8 @@ public:
     ControlSignals();
 
     // Getter methods for various control signals
-    InputSelector AInput() const; // AInput
-    InputSelector BInput() const;  // BInput
+    InputSelectorEXStage AInput() const; // AInput
+    InputSelectorEXStage BInput() const;  // BInput
     ALUOp  ALUOp() const; // ALUOp
     
     bool isBranch() const; // isBranch
