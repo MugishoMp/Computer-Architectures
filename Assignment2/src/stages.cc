@@ -18,13 +18,9 @@ InstructionFetchStage::propagate()
 {
   try
     {
-      // INPUT Instruction Memory - PC
-      instructionMemory.setAddress(PC);
-      instructionMemory.setSize(4);
 
       // INPUT ADD - PC + 4
       // OUTPUT ADD - NEXT_PC
-      MemAddress NEXT_PC = PC + 4;
       RegValue BRANCH_PC = ex_m.ALU_OUTPUT;
       
 
@@ -33,7 +29,7 @@ InstructionFetchStage::propagate()
       // INPUT Mux - NEXT_PC
       // OUTPUT Mux - mux.getOutput();
       Mux<RegValue, InputSelectorIFStage> mux;
-      mux.setInput(InputSelectorIFStage::InputOne, NEXT_PC );
+      mux.setInput(InputSelectorIFStage::InputOne, PC );
       mux.setInput(InputSelectorIFStage::InputTwo, BRANCH_PC);
       mux.setSelector(ex_m.BRANCH_DECISION);
 
@@ -41,12 +37,20 @@ InstructionFetchStage::propagate()
       // OUTPUT PC - PC
 
 
-      /* Enable this once you have implemented instruction fetch. */
-      if (instructionMemory.getValue() == TestEndMarker)
-        throw TestEndMarkerEncountered(PC);
 
       PC = mux.getOutput();
+
+      // INPUT Instruction Memory - PC
+      instructionMemory.setAddress(PC);
+      instructionMemory.setSize(4);
+      std::cout << std::hex << PC << std::endl;
+
+      PC += 4;
       
+      instr = instructionMemory.getValue();
+      /* Enable this once you have implemented instruction fetch. */
+      if (instr == TestEndMarker)
+        throw TestEndMarkerEncountered(PC);
 
     }
     catch (TestEndMarkerEncountered &e)
@@ -66,7 +70,7 @@ InstructionFetchStage::clockPulse()
   if_id.PC = PC;
   
   // OUTPUT Instruction Memory
-  if_id.INSTRUCTION_WORD = instructionMemory.getValue();
+  if_id.INSTRUCTION_WORD = instr;
 }
 
 
@@ -122,7 +126,6 @@ InstructionDecodeStage::propagate()
     SIGN_EXTENDED_IMMEIDATE = 0;
     // the control signal immediateInput needs to return false;
   }
-  std::cout << std::hex << PC << std::endl;
 
   /* debug mode: dump decoded instructions to cerr.
    * In case of no pipelining: always dump.
@@ -226,6 +229,14 @@ ExecuteStage::propagate()
   alu.setB(mux2.getOutput());
   alu.setOp(CONTROL_SIGNALS.AluOp());
 
+
+    std::cout << "A: ";
+    std::cout << std::hex << mux1.getOutput() << std::endl;
+    std::cout << "B: ";
+    std::cout << std::hex << mux2.getOutput() << std::endl;
+    std::cout << "Result: ";
+    std::cout << std::hex << alu.getResult() << std::endl;
+
   FLAG = alu.getFlag();
   ZERO_FLAG = alu.getZeroFlag();
   SIGN_FLAG = alu.getSignFlag();
@@ -288,31 +299,36 @@ MemoryStage::propagate()
    * inputs from pipeline register.
    */
 
-  // PC
   PC = ex_m.PC;
-
-  // CONTROL SIGNALS
   CONTROL_SIGNALS = ex_m.CONTROL_SIGNALS;
-
-  
   RegValue DATA = ex_m.RS2;
   RegValue EFFECTIVE_ADDRESS = ex_m.ALU_OUTPUT;
+
+  
+
   dataMemory.setDataIn(DATA);
   dataMemory.setAddress(EFFECTIVE_ADDRESS);
 
   // size of the data, so either 1, 2 or 4 bytes
-  if (ex_m.CONTROL_SIGNALS.getDataSize() > 0) // ???????
-    dataMemory.setSize(ex_m.CONTROL_SIGNALS.getDataSize());
-
+  if (CONTROL_SIGNALS.getDataSize() > 0) // ???????
+    dataMemory.setSize(CONTROL_SIGNALS.getDataSize());
 
   //read
-  dataMemory.setReadEnable(ex_m.CONTROL_SIGNALS.isReadOpBool());
-  DATA_READ_FROM_MEMORY = dataMemory.getDataOut(false);
+  if (CONTROL_SIGNALS.isReadOpBool()) {
+
+    // std::cout << "BYTES read: " << (int) CONTROL_SIGNALS.getDataSize() << "AT PC: ";
+    dataMemory.setReadEnable(true);
+    // TODO do we want to sign extend
+    DATA_READ_FROM_MEMORY = dataMemory.getDataOut(false);
+  } else {
+    dataMemory.setReadEnable(false);
+  }
 
   //write
-  dataMemory.setWriteEnable(ex_m.CONTROL_SIGNALS.isWriteOpBool());
-  dataMemory.clockPulse();
-
+  // if (CONTROL_SIGNALS.isWriteOpBool()) {
+  //   std::cout << std::hex << PC - 4 << std::endl;
+  // }
+  dataMemory.setWriteEnable(CONTROL_SIGNALS.isWriteOpBool());
   ALU_RESULT = ex_m.ALU_OUTPUT;
 
   // RD
@@ -339,6 +355,8 @@ MemoryStage::clockPulse()
 
   // CONTROL SIGNALS
   m_wb.CONTROL_SIGNALS = CONTROL_SIGNALS;
+
+  dataMemory.clockPulse();
 }
 
 /*
@@ -370,9 +388,8 @@ WriteBackStage::propagate()
 
   // Registers INPUT 4(is is RegValue BTW!!!!)
   if (CONTROL_SIGNALS.regWriteInput()) {
-    if (CONTROL_SIGNALS.setLinkRegister()) {
+    if (CONTROL_SIGNALS.setLinkRegister())
       regfile.setWriteData(PC);
-    }
     else
       regfile.setWriteData(mux.getOutput());
       

@@ -8,6 +8,7 @@
 #include "alu.h"
 
 #include "inst-decoder.h"
+#include <iostream>
 
 #ifdef _MSC_VER
 /* MSVC intrinsics */
@@ -72,15 +73,21 @@ ALU::getResult()
             break;
 
         // Shift Operations
+        // we ignore the 5th bit of B
         case ALUOp::SHL:
-            result = A << B;
+
+
+            // Perform the shift operation
+            result = A << (int)(B & ~(1 << 5));
             break;
         // Shift Operations
         case ALUOp::SHL_16:
             result = B << 16;
             break;
+        // we ignore the 5th bit of B
         case ALUOp::SHR:
-            result = A >> B;
+            result = 66;
+            std::cout << "TESTESTEST" << std::endl;
             break;
         case ALUOp::SAR:
             // Check if the highest-order bit is set

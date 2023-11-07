@@ -161,6 +161,7 @@ class InstructionFetchStage : public Stage
 
     InstructionMemory instructionMemory;
     MemAddress &PC;
+    RegValue instr;
 };
 
 /*

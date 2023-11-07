@@ -135,7 +135,8 @@ ALUOp ControlSignals::AluOp() const
       break;
     case InstructionMnemonic::L_SRA:
       // Perform ALU operation SAR
-      return ALUOp::SAR;
+      std::cout << "TESTESTEST" << std::endl;
+      return ALUOp::SHR;
       break;
     case InstructionMnemonic::L_SFEQI:
     case InstructionMnemonic::L_SFEQ:
