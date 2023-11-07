@@ -16,6 +16,7 @@
 
 
 
+
 /* Pipeline registers may be read during propagate and may only be
  * written during clockPulse. Note that you cannot read the incoming
  * pipeline registers in clockPulse (e.g. in clockPulse of EX, you cannot
@@ -203,8 +204,8 @@ class InstructionDecodeStage : public Stage
 
     MemAddress PC{};
     /* TODO: add other necessary fields/buffers. */
-    RegValue signExtendedImmediate;
-    ControlSignals controlSignals;
+    RegValue SIGN_EXTENDED_IMMEIDATE;
+    ControlSignals CONTROL_SIGNALS;
 };
 
 /*
@@ -231,9 +232,19 @@ class ExecuteStage : public Stage
     MemAddress PC{};
     /* TODO: add other necessary fields/buffers and components (ALU anyone?) */
     ALU alu;
-    RegNumber RS2{};
+    RegValue RS2{};
     RegNumber RD{};
-    InputSelectorIFStage EQUALITY_TEST{};
+    InputSelectorIFStage BRANCH_DECISION{};
+    ControlSignals CONTROL_SIGNALS;
+
+    // bool FLAG;     uninitializedFlag is not initialized here, so it has an 
+    //                indeterminate value
+    //  bool FLAG{};  initializedFlag is initialized to false due to the {}
+    bool FLAG{};
+    bool ZERO_FLAG{};
+    bool SIGN_FLAG{};
+    bool CARRY_FLAG{};
+    bool OVERFLOW_FLAG{};
 };
 
 /*
@@ -265,6 +276,7 @@ class MemoryStage : public Stage
     RegValue DATA_READ_FROM_MEMORY{};
     RegValue ALU_RESULT{};
     RegNumber RD{};
+    ControlSignals CONTROL_SIGNALS;
 };
 
 /*
@@ -295,7 +307,9 @@ class WriteBackStage : public Stage
 
     /* TODO add other necessary fields/buffers and components */
 
+    MemAddress PC{};
     uint64_t &nInstrCompleted;
+    ControlSignals CONTROL_SIGNALS;
 };
 
 #endif /* __STAGES_H__ */

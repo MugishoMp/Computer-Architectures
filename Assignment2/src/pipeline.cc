@@ -21,12 +21,14 @@ Pipeline::Pipeline(bool pipelining,
   /* TODO: this might need modification in case the stages need access
    * to more shared components.
    */
+
   stages.emplace_back(std::make_unique<InstructionFetchStage>(pipelining,
+                                                              ex_m,
                                                               if_id,
                                                               instructionMemory,
                                                               PC));
   stages.emplace_back(std::make_unique<InstructionDecodeStage>(pipelining,
-                                                               if_id, id_ex,
+                                                               if_id, m_wb, id_ex,
                                                                regfile,
                                                                decoder,
                                                                nInstrIssued,

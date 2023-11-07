@@ -16,7 +16,7 @@ void
 InstructionMemory::setSize(const uint8_t size)
 {
   if (size != 2 and size != 4)
-    throw IllegalAccess("Invalid size " + std::to_string(size));
+    throw IllegalAccess("InstructionMemory::SetSize::Invalid size " + std::to_string(size));
 
   this->size = size;
 }
@@ -39,7 +39,7 @@ InstructionMemory::getValue() const
         return bus.readWord(addr);
 
       default:
-        throw IllegalAccess("Invalid size " + std::to_string(size));
+        throw IllegalAccess("InstructionMemory::GetValue::Invalid size " + std::to_string(size));
     }
 }
 
@@ -53,8 +53,8 @@ void
 DataMemory::setSize(const uint8_t size)
 {
   // check if not 2 0r 4 throw illefgal access excecption
-  if (size != 2 && size != 4)
-    throw IllegalAccess("Invalid size " + std::to_string(size));
+  if (size != 1 && size != 2 && size != 4)
+    throw IllegalAccess("DataMemory::DataMemory::Invalid size " + std::to_string(size));
 
   this->size = size;
 }

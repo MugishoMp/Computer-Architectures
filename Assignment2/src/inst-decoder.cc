@@ -757,7 +757,7 @@ InstructionDecoder::getFunctionCodeJTypeInstruction() const
       functionCode = InstructionMnemonic::L_J;
       break;
     case 0x01:
-      functionCode = InstructionMnemonic::L_J;
+      functionCode = InstructionMnemonic::L_JAL;
       break;
     case 0x03:
       functionCode = InstructionMnemonic::L_BNF;

@@ -9,6 +9,8 @@ ControlSignals::ControlSignals()
 
 InputSelectorEXStage ControlSignals::AInput() const
 {
+  // we basically check if the instruction is an branch instruction. If it is
+  // we take the mux entry that contains the PC
   InputSelectorEXStage input = InputSelectorEXStage::InputTwo;
   if (isBranch()) {
     input = InputSelectorEXStage::InputOne;
@@ -18,6 +20,8 @@ InputSelectorEXStage ControlSignals::AInput() const
 
 InputSelectorEXStage ControlSignals::BInput() const
 {
+  // we basically check if the instruction has an immediate field or not.
+  // if it has we will pick the mux entry that contains the immediate
   InputSelectorEXStage input = InputSelectorEXStage::InputOne;
   switch (opCode) {
     case 0x00:
@@ -61,36 +65,48 @@ InputSelectorEXStage ControlSignals::BInput() const
   return input;
 }
 
-ALUOp ControlSignals::ALUOp() const
+ALUOp ControlSignals::AluOp() const
 {
 
+  // std::cerr << "function code in AluOp: " << static_cast<int>(this->functionCode) << std::endl;
+
   switch (this->functionCode) {
+    case InstructionMnemonic::L_JR:
+      // Perform ALU operation ADD
+      return ALUOp::B;
+      break;
+
+      
+    case InstructionMnemonic::L_MOVHI:
+      return ALUOp::SHL_16;
+      break;
+
     case InstructionMnemonic::L_ADDI:
-    case InstructionMnemonic::L_ADDIC:
-    case InstructionMnemonic::L_ADDC:
     case InstructionMnemonic::L_ADD:
+    case InstructionMnemonic::L_LWZ:
+    case InstructionMnemonic::L_SW:
+    case InstructionMnemonic::L_LBZ:
+    case InstructionMnemonic::L_SB:
       // Perform ALU operation ADD
       return ALUOp::ADD;
       break;
+
+    case InstructionMnemonic::L_JAL:
+    case InstructionMnemonic::L_J:
+    case InstructionMnemonic::L_BF:
+    case InstructionMnemonic::L_BNF:
+      // Perform ALU operation ADD
+      return ALUOp::SHIFT_ADD;
+      break;
+
     case InstructionMnemonic::L_SUB:
       // Perform ALU operation SUB
       return ALUOp::SUB;
       break;
-    case InstructionMnemonic::L_MULI:
-    case InstructionMnemonic::L_MUL:
-    case InstructionMnemonic::L_MULU:
-    case InstructionMnemonic::L_MULD:
-    case InstructionMnemonic::L_MULDU:
-    case InstructionMnemonic::L_MAC:
-    case InstructionMnemonic::L_MACU:
     case InstructionMnemonic::L_MACI:
-    case InstructionMnemonic::L_MSB:
-    case InstructionMnemonic::L_MSBU:
       // Perform ALU operation MUL
       return ALUOp::MUL;
       break;
-    case InstructionMnemonic::L_DIV:
-    case InstructionMnemonic::L_DIVU:
       // Perform ALU operation DIV
       return ALUOp::DIV;
       break;
@@ -104,8 +120,6 @@ ALUOp ControlSignals::ALUOp() const
       // Perform ALU operation OR
       return ALUOp::OR;
       break;
-    case InstructionMnemonic::L_XORI:
-    case InstructionMnemonic::L_XOR:
       // Perform ALU operation XOR
       return ALUOp::XOR;
       break;
@@ -119,7 +133,6 @@ ALUOp ControlSignals::ALUOp() const
       // Perform ALU operation SHR
       return ALUOp::SHR;
       break;
-    case InstructionMnemonic::L_SRAI:
     case InstructionMnemonic::L_SRA:
       // Perform ALU operation SAR
       return ALUOp::SAR;
@@ -129,55 +142,133 @@ ALUOp ControlSignals::ALUOp() const
       // Perform ALU operation EQ
       return ALUOp::EQ;
       break;
-    case InstructionMnemonic::L_SFNEI:
     case InstructionMnemonic::L_SFNE:
       // Perform ALU operation NEQ
       return ALUOp::NEQ;
       break;
-    case InstructionMnemonic::L_SFGTUI:
-    case InstructionMnemonic::L_SFGTSI:
     case InstructionMnemonic::L_SFGTU:
     case InstructionMnemonic::L_SFGTS:
       // Perform ALU operation LT
       return ALUOp::GT;
       break;
-    case InstructionMnemonic::L_SFGEUI:
-    case InstructionMnemonic::L_SFGESI:
-    case InstructionMnemonic::L_SFGEU:
     case InstructionMnemonic::L_SFGES:
       // Perform ALU operation LTE
       return ALUOp::GTE;
-      break;
-    case InstructionMnemonic::L_SFLTUI:
-    case InstructionMnemonic::L_SFLTSI:
-      // Perform ALU operation LTE
-      return ALUOp::LT;
-      break;
-    case InstructionMnemonic::L_SFLEUI:
-    case InstructionMnemonic::L_SFLESI:
-      // Perform ALU operation LTE
-      return ALUOp::LTE;
       break;
     case InstructionMnemonic::L_NOP:
       // Perform ALU operation NOP
       return ALUOp::NOP;
       break;
 
-    case InstructionMnemonic::INVALID:
-      // Handle MISC instruction
-      break;
     default:
       // Handle other cases or throw an exception
-      std::cerr << "ALU operation not supported" << std::endl;
+      std::cerr << "ALU operation not supported: " << static_cast<int>(this->functionCode)<< std::endl;
       break;
   }
 
 }
-    
+
 
 bool ControlSignals::regWriteInput() const
 {
-    return false;
+  switch(this->functionCode) {
+    // Arithmetic and Logical Operations
+    case InstructionMnemonic::L_ADD:
+    case InstructionMnemonic::L_SUB:
+    case InstructionMnemonic::L_OR:
+    case InstructionMnemonic::L_SLL:
+    case InstructionMnemonic::L_SRA:
+
+    // Load Instructions
+    case InstructionMnemonic::L_LWZ:
+    case InstructionMnemonic::L_LBZ:
+    case InstructionMnemonic::L_LBS:
+
+    // Immediate Instructions
+    case InstructionMnemonic::L_ADDI:
+    case InstructionMnemonic::L_ANDI:
+    case InstructionMnemonic::L_ORI:
+    case InstructionMnemonic::L_SLLI:
+    case InstructionMnemonic::L_SRLI:
+    case InstructionMnemonic::L_MOVHI:
+      return true;
+
+
+    // Jump and Link Instructions
+    case InstructionMnemonic::L_JAL:
+      return true;
+
+    case InstructionMnemonic::L_AND:
+    case InstructionMnemonic::L_SRL:
+      std::cerr << "regWriteInput::instruction not implemented" << std::endl;
+    // For all other instructions
+    default:
+      return false;
+  }
+}
+
+InputSelectorWBStage ControlSignals::isReadOp() const 
+{
+  switch (this->functionCode) {
+    case InstructionMnemonic::L_LWA:
+    case InstructionMnemonic::L_LWZ:
+    case InstructionMnemonic::L_LBZ:
+    case InstructionMnemonic::L_LBS:
+      return InputSelectorWBStage::InputOne;
+    default:
+      return InputSelectorWBStage::InputTwo;
+  }
+
+}
+
+
+bool ControlSignals::isReadOpBool() const 
+{
+  switch (this->functionCode) {
+    case InstructionMnemonic::L_LWA:
+    case InstructionMnemonic::L_LWZ:
+    case InstructionMnemonic::L_LBZ:
+    case InstructionMnemonic::L_LBS:
+      return true;
+    default:
+      return false;
+  }
+}
+
+bool ControlSignals::isWriteOpBool() const 
+{
+  switch (this->functionCode) {
+    case InstructionMnemonic::L_SW:
+    case InstructionMnemonic::L_SB:
+    case InstructionMnemonic::L_SH:
+      return true;
+    default:
+      return false;
+  }
+}
+
+uint8_t ControlSignals::getDataSize() const 
+{
+  switch (this->functionCode) {
+    // Word-sized operations (4 bytes)
+    case InstructionMnemonic::L_LWA:
+    case InstructionMnemonic::L_SW:
+    case InstructionMnemonic::L_LWZ:
+      return 4;
+
+    // Half-word-sized operations (2 bytes)
+    case InstructionMnemonic::L_SH:
+      return 2;
+
+    // Byte-sized operations (1 byte)
+    case InstructionMnemonic::L_LBZ:
+    case InstructionMnemonic::L_LBS:
+    case InstructionMnemonic::L_SB:
+      return 1;
+    // Default case for other instructions
+    default:
+      return 0;
+  }
 }
 
 bool ControlSignals::isBranch() const
@@ -187,9 +278,7 @@ bool ControlSignals::isBranch() const
     case InstructionMnemonic::L_JAL:
     case InstructionMnemonic::L_BNF:
     case InstructionMnemonic::L_BF:
-    case InstructionMnemonic::L_RFE:
     case InstructionMnemonic::L_JR:
-    case InstructionMnemonic::L_JALR:
       // Handle branch instruction
       return true;
       break; 
@@ -197,5 +286,44 @@ bool ControlSignals::isBranch() const
       // we are not dealing with a branch instruction
       return false;
       break;
+  }
+}
+
+bool ControlSignals::jump(bool FLAG) const
+{
+  switch (this->functionCode) {
+    case InstructionMnemonic::L_J:
+      // PC ← exts(Immediate << 2) + JumpInsnAd
+      return true;
+    case InstructionMnemonic::L_JAL:
+      // PC ← exts(Immediate << 2) + JumpInsnAddr
+      // LR ← CPUCFGR[ND] ? JumpInsnAddr + 4 : DelayInsnAddr + 4
+      return true;
+    case InstructionMnemonic::L_JR:
+      // PC ← rB
+      return true;
+      break; 
+    case InstructionMnemonic::L_BF:
+      // EA ← exts(Immediate << 2) + BranchInsnAddr
+      // PC ← EA if SR[F] set
+      return FLAG;
+    case InstructionMnemonic::L_BNF:
+      // EA ← exts(Immediate << 2) + BranchInsnAddr
+      // PC ← EA if SR[F] cleared
+      return !FLAG;
+    default:
+      // we are not dealing with a branch instruction
+      return false;
+      break;
+  }
+}
+
+bool ControlSignals::setLinkRegister() const 
+{
+  switch (this->functionCode) {
+    case InstructionMnemonic::L_JAL:
+      return true;
+    default:
+      return false;
   }
 }

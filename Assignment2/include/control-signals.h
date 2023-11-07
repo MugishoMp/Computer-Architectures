@@ -42,14 +42,21 @@ public:
     // Getter methods for various control signals
     InputSelectorEXStage AInput() const; // AInput
     InputSelectorEXStage BInput() const;  // BInput
-    ALUOp  ALUOp() const; // ALUOp
+    ALUOp AluOp() const; // ALUOp
     
     bool isBranch() const; // isBranch
     bool regWriteInput() const; // regWriteInput
+    InputSelectorWBStage isReadOp() const;
+    bool isReadOpBool() const;
+    bool isWriteOpBool() const;
+    uint8_t getDataSize() const;
+    bool jump(bool FLAG) const;
+    bool setLinkRegister() const;
 
     // Setter methods for various control signals
-    void setOpcode(uint16_t opCode) { this->opCode = opCode; };
-    void setFunctionCode(InstructionMnemonic functionCode) { this->functionCode = functionCode; };
+    void setOpcode(uint16_t newOpCode) { this->opCode = newOpCode; };
+    void setFunctionCode(InstructionMnemonic newFunctionCode) { this->functionCode = newFunctionCode; };
+
 
 private:
     uint16_t opCode;

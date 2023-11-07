@@ -32,6 +32,7 @@ enum class ALUOp {
 
     // Shift Operations
     SHL,  // Shift Left
+    SHL_16,  // Shift Left
     SHR,  // Shift Right (Logical)
     SAR,  // Shift Right (Arithmetic)
 
@@ -45,7 +46,11 @@ enum class ALUOp {
 
     // Other Operations
     INC,  // Increment
-    DEC   // Decrement
+    DEC,  // Decrement
+
+    SHIFT_ADD, // shift to left with two and add
+    A, // return only A
+    B  // return only B
 };
 
 // Define the flags
@@ -73,6 +78,7 @@ class ALU
     RegValue getResult();
 
     // Methods to retrieve the status of the flags
+    bool getFlag() const { return flag; }
     bool getZeroFlag() const { return zeroFlag; }
     bool getSignFlag() const { return signFlag; }
     bool getCarryFlag() const { return carryFlag; }
@@ -85,6 +91,7 @@ class ALU
     ALUOp op;
 
     // Flags
+    bool flag = false;
     bool zeroFlag = false;
     bool signFlag = false;
     bool carryFlag = false;

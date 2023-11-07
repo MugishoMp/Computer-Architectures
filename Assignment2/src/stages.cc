@@ -18,39 +18,42 @@ InstructionFetchStage::propagate()
 {
   try
     {
+      // INPUT Instruction Memory - PC
+      instructionMemory.setAddress(PC);
+      instructionMemory.setSize(4);
+
       // INPUT ADD - PC + 4
       // OUTPUT ADD - NEXT_PC
       MemAddress NEXT_PC = PC + 4;
+      RegValue BRANCH_PC = ex_m.ALU_OUTPUT;
+      
 
       // INPUT Mux - ex_m.BRANCH_DECISION
       // INPUT Mux - ex_m.BRANCH_PC
       // INPUT Mux - NEXT_PC
       // OUTPUT Mux - mux.getOutput();
       Mux<RegValue, InputSelectorIFStage> mux;
-      mux.setInput(InputSelectorIFStage::InputOne, ex_m.BRANCH_PC);
-      mux.setInput(InputSelectorIFStage::InputTwo, NEXT_PC);
+      mux.setInput(InputSelectorIFStage::InputOne, NEXT_PC );
+      mux.setInput(InputSelectorIFStage::InputTwo, BRANCH_PC);
       mux.setSelector(ex_m.BRANCH_DECISION);
-
-      // INPUT Instruction Memory - PC
-      instructionMemory.setAddress(PC);
-      instructionMemory.setSize(4);
 
       // INPUT PC - mux.getOutput();
       // OUTPUT PC - PC
+
+
+      /* Enable this once you have implemented instruction fetch. */
+      if (instructionMemory.getValue() == TestEndMarker)
+        throw TestEndMarkerEncountered(PC);
+
       PC = mux.getOutput();
       
 
-#if 0
-      /* Enable this once you have implemented instruction fetch. */
-      if (instructionWord == TestEndMarker)
-        throw TestEndMarkerEncountered(PC);
-#endif
     }
-  catch (TestEndMarkerEncountered &e)
+    catch (TestEndMarkerEncountered &e)
     {
       throw;
     }
-  catch (std::exception &e)
+    catch (std::exception &e)
     {
       throw InstructionFetchFailure(PC);
     }
@@ -81,15 +84,14 @@ dump_instruction(std::ostream &os, const uint32_t instructionWord,
 void
 InstructionDecodeStage::propagate()
 {
+  // PC
+  PC = if_id.PC;
+
   // decode instruction
   decoder.setInstructionWord(if_id.INSTRUCTION_WORD);
   // set control signals
-  controlSignals.setOpcode(decoder.getOpcode());
-  controlSignals.setFunctionCode(decoder.getFunctionCode());
-
-  // PC
-  PC = if_id.PC;
-  
+  CONTROL_SIGNALS.setOpcode(decoder.getOpcode());
+  CONTROL_SIGNALS.setFunctionCode(decoder.getFunctionCode());
 
   // Registers INPUT 1 - decoder.getA()
   try {
@@ -103,24 +105,24 @@ InstructionDecodeStage::propagate()
   try {
     regfile.setRS2(decoder.getB());
   } catch (IllegalInstruction &e) {
-    regfile.setRS1(MaxRegs);
+    regfile.setRS2(MaxRegs);
     // the control signal rs2Input needs to return false;
   }
 
-  // Registers INPUT 3 - m_wb.RD
-  regfile.setRD(m_wb.RD);
+  // Registers INPUT 3 - RD (the register we want to write data to)
+  // handled in the WB stage
 
-  // Registers INPUT 4
+  // Registers INPUT 4 - writeData
   // handled in the WB stage
 
   // Sign Extend INPUT 1
   try {
-    signExtendedImmediate = decoder.getImmediate();
+    SIGN_EXTENDED_IMMEIDATE = decoder.getImmediate();
   } catch (IllegalInstruction &e) {
-    signExtendedImmediate = 0;
+    SIGN_EXTENDED_IMMEIDATE = 0;
     // the control signal immediateInput needs to return false;
   }
-  
+  std::cout << std::hex << PC << std::endl;
 
   /* debug mode: dump decoded instructions to cerr.
    * In case of no pipelining: always dump.
@@ -148,17 +150,29 @@ void InstructionDecodeStage::clockPulse()
 {
   // PC
   id_ex.PC = PC;
-  
+
+  id_ex.CONTROL_SIGNALS = CONTROL_SIGNALS;
+
   // Registers OUTPUT 1
   id_ex.RS1 = regfile.getReadData1();
   // Registers OUTPUT 2
   id_ex.RS2 = regfile.getReadData2();
 
   // Sign Extend OUTPUT 1
-  id_ex.IMMEDIATE = signExtendedImmediate;
+  id_ex.IMMEDIATE = SIGN_EXTENDED_IMMEIDATE;
 
   // Register RD
-  id_ex.RD = decoder.getD();
+  try {
+    // set rd to 9
+    if (CONTROL_SIGNALS.setLinkRegister()) {
+      // set link register
+      id_ex.RD = 9;
+    } else {
+      id_ex.RD = decoder.getD();
+    }
+  } catch (IllegalInstruction &e) {
+    id_ex.RD = MaxRegs;
+  }
 
   /* ignore the "instruction" in the first cycle. */
   if (! pipelining || (pipelining && PC != 0x0))
@@ -182,14 +196,7 @@ ExecuteStage::propagate()
 
   // PC
   PC = id_ex.PC;
-
-  // INPUT FLAG TEST - id_ex.RS1 (if true switch to branch address)
-  // INPUT FLAG TEST - id_ex.RS2 (if false take next address)
-  // OUTPUT FLAG TEST EQUALITY_TEST
-  if (id_ex.RS1 == id_ex.RS2)
-    EQUALITY_TEST = InputSelectorIFStage::InputOne;
-  else
-    EQUALITY_TEST = InputSelectorIFStage::InputTwo;
+  CONTROL_SIGNALS = id_ex.CONTROL_SIGNALS;
 
 
   // INPUT Mux - id_ex.PC
@@ -197,9 +204,9 @@ ExecuteStage::propagate()
   // INPUT Mux (implicit) - CONTROL_SIGNALS.AInput()
   // OUTPUT Mux - mux.getOutput();
   Mux<RegValue, InputSelectorEXStage> mux1;
-  mux1.setInput(InputSelectorEXStage::InputOne, id_ex.PC);
+  mux1.setInput(InputSelectorEXStage::InputOne, PC);
   mux1.setInput(InputSelectorEXStage::InputTwo, id_ex.RS1);
-  mux1.setSelector(id_ex.CONTROL_SIGNALS.AInput());
+  mux1.setSelector(CONTROL_SIGNALS.AInput());
   
 
   // INPUT Mux - id_ex.RS2
@@ -209,7 +216,7 @@ ExecuteStage::propagate()
   Mux<RegValue, InputSelectorEXStage> mux2;
   mux2.setInput(InputSelectorEXStage::InputOne, id_ex.RS2);
   mux2.setInput(InputSelectorEXStage::InputTwo, id_ex.IMMEDIATE);
-  mux2.setSelector(id_ex.CONTROL_SIGNALS.BInput());
+  mux2.setSelector(CONTROL_SIGNALS.BInput());
 
   // INPUT ALU - mux1.getOutput()
   // INPUT ALU - mux2.getOutput()
@@ -217,7 +224,23 @@ ExecuteStage::propagate()
   // OUTPUT ALU
   alu.setA(mux1.getOutput());
   alu.setB(mux2.getOutput());
-  alu.setOp(id_ex.CONTROL_SIGNALS.ALUOp());
+  alu.setOp(CONTROL_SIGNALS.AluOp());
+
+  FLAG = alu.getFlag();
+  ZERO_FLAG = alu.getZeroFlag();
+  SIGN_FLAG = alu.getSignFlag();
+  CARRY_FLAG = alu.getCarryFlag();
+  OVERFLOW_FLAG = alu.getOverflowFlag();
+
+  // INPUT FLAG TEST - id_ex.RS1 (if true switch to branch address)
+  // INPUT FLAG TEST - id_ex.RS2 (if false take next address)
+  // OUTPUT FLAG TEST BRANCH_DECISION
+  if (CONTROL_SIGNALS.jump(FLAG)){
+    BRANCH_DECISION = InputSelectorIFStage::InputTwo;
+  } else {
+    BRANCH_DECISION = InputSelectorIFStage::InputOne;
+  }
+
 
   // RS2
   RS2 = id_ex.RS2;
@@ -237,8 +260,11 @@ ExecuteStage::clockPulse()
   // PC
   ex_m.PC = PC;
 
+  // CONTROL_SIGNALS
+  ex_m.CONTROL_SIGNALS = CONTROL_SIGNALS;
+
   // Equality test
-  ex_m.BRANCH_DECISION = EQUALITY_TEST;
+  ex_m.BRANCH_DECISION = BRANCH_DECISION;
 
   // ALU 
   ex_m.ALU_OUTPUT = alu.getResult();
@@ -248,6 +274,7 @@ ExecuteStage::clockPulse()
 
   // RD
   ex_m.RD = RD;
+
 }
 
 /*
@@ -261,24 +288,29 @@ MemoryStage::propagate()
    * inputs from pipeline register.
    */
 
+  // PC
   PC = ex_m.PC;
 
-  RegValue EFFECTIVE_ADDRESS = ex_m.ALU_OUTPUT;
+  // CONTROL SIGNALS
+  CONTROL_SIGNALS = ex_m.CONTROL_SIGNALS;
+
   
   RegValue DATA = ex_m.RS2;
-
+  RegValue EFFECTIVE_ADDRESS = ex_m.ALU_OUTPUT;
   dataMemory.setDataIn(DATA);
   dataMemory.setAddress(EFFECTIVE_ADDRESS);
 
   // size of the data, so either 1, 2 or 4 bytes
-  dataMemory.setSize(ex_m.CONTROL_SIGNALS.getDataSize());
+  if (ex_m.CONTROL_SIGNALS.getDataSize() > 0) // ???????
+    dataMemory.setSize(ex_m.CONTROL_SIGNALS.getDataSize());
+
 
   //read
-  dataMemory.setReadEnable(ex_m.CONTROL_SIGNALS.isReadOp());
+  dataMemory.setReadEnable(ex_m.CONTROL_SIGNALS.isReadOpBool());
   DATA_READ_FROM_MEMORY = dataMemory.getDataOut(false);
 
   //write
-  dataMemory.setWriteEnable(ex_m.CONTROL_SIGNALS.isWriteOp());
+  dataMemory.setWriteEnable(ex_m.CONTROL_SIGNALS.isWriteOpBool());
   dataMemory.clockPulse();
 
   ALU_RESULT = ex_m.ALU_OUTPUT;
@@ -304,6 +336,9 @@ MemoryStage::clockPulse()
 
   // OUTPUT RD
   m_wb.RD = RD;
+
+  // CONTROL SIGNALS
+  m_wb.CONTROL_SIGNALS = CONTROL_SIGNALS;
 }
 
 /*
@@ -320,7 +355,10 @@ WriteBackStage::propagate()
    * signals
    */
   
-  // INPUT (implicit) Mux - controlSignals.X()
+  PC = m_wb.PC;
+  CONTROL_SIGNALS = m_wb.CONTROL_SIGNALS;
+
+  // INPUT (implicit) Mux - CONTROL_SIGNALS.X()
   // INPUT 1 Mux - m_wb.AAAAAA
   // INPUT 2 Mux - m_wb.BBBBBB
   // OUTPUT Mux - mux.getOutput();
@@ -328,13 +366,22 @@ WriteBackStage::propagate()
   mux.setInput(InputSelectorWBStage::InputOne, m_wb.DATA_READ_FROM_MEMORY);
   mux.setInput(InputSelectorWBStage::InputTwo, m_wb.ALU_RESULT);
   // TODO control signal
-  mux.setSelector(m_wb.CONTROL_SIGNALS.isReadOp());
+  mux.setSelector(CONTROL_SIGNALS.isReadOp());
 
   // Registers INPUT 4(is is RegValue BTW!!!!)
-  regfile.setWriteData(mux.getOutput());
-  // TODO control signal
-  regfile.setWriteEnable(m_wb.CONTROL_SIGNALS.isWriteOp());
-
+  if (CONTROL_SIGNALS.regWriteInput()) {
+    if (CONTROL_SIGNALS.setLinkRegister()) {
+      regfile.setWriteData(PC);
+    }
+    else
+      regfile.setWriteData(mux.getOutput());
+      
+    // TODO control signal
+    regfile.setWriteEnable(true);
+    regfile.setRD(m_wb.RD);
+  } else {
+    regfile.setWriteEnable(false);
+  }
 }
 
 void

@@ -75,6 +75,10 @@ ALU::getResult()
         case ALUOp::SHL:
             result = A << B;
             break;
+        // Shift Operations
+        case ALUOp::SHL_16:
+            result = B << 16;
+            break;
         case ALUOp::SHR:
             result = A >> B;
             break;
@@ -120,6 +124,16 @@ ALU::getResult()
             break;
         case ALUOp::DEC:
             result = A - 1;
+            break;
+        case ALUOp::SHIFT_ADD:
+            // we do - 2 because we need to take the current pc, not the next one
+            result = (A - 4) + (B << 2);
+            break;
+        case ALUOp::A:
+            result = A;
+            break;
+        case ALUOp::B:
+            result = B;
             break;
     }
 
