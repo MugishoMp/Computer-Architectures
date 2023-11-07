@@ -86,8 +86,7 @@ ALU::getResult()
             break;
         // we ignore the 5th bit of B
         case ALUOp::SHR:
-            result = 66;
-            std::cout << "TESTESTEST" << std::endl;
+            result =  A >> (int)(B & ~(1 << 5));
             break;
         case ALUOp::SAR:
             // Check if the highest-order bit is set
@@ -108,21 +107,27 @@ ALU::getResult()
         // Comparison Operations
         case ALUOp::EQ:
             result = (A == B);
+            updateFlags(result);
             break;
         case ALUOp::NEQ:
             result = (A != B);
+            updateFlags(result);
             break;
         case ALUOp::LT:
             result = (A < B);
+            updateFlags(result);
             break;
         case ALUOp::LTE:
             result = (A <= B);
+            updateFlags(result);
             break;
         case ALUOp::GT:
             result = (A > B);
+            updateFlags(result);
             break;
         case ALUOp::GTE:
             result = (A >= B);
+            updateFlags(result);
             break;
 
         // Other Operations
@@ -145,7 +150,6 @@ ALU::getResult()
     }
 
     // After the result is set, call updateFlags
-    updateFlags(result);
 
     return result;
 }
@@ -158,6 +162,8 @@ void ALU::updateFlags(RegValue result)
 
     // Sign flag (assuming RegValue is a signed type)
     signFlag = (result < 0);
+    
+    flag = (flag & true);
 
     // Carry and Overflow flags would depend on the operation and would need to be
     // updated accordingly, possibly using additional information from the operation

@@ -155,6 +155,7 @@ InstructionDecoder::getOp2() const
   switch (getInstructionType()) {
     case R:
       op2 = (getInstructionWord() & BITS_9_8) >> 8; // Right shift by 8 bits
+      if ((getInstructionWord() & 0b1000) == 0b1000) op2 = (getInstructionWord() & BITS_9_6) >> 6; // Right shift by 8 bits
       break;
     case SH:
       op2 = (getInstructionWord() & BITS_7_6) >> 6; // Right shift by 8 bits
@@ -593,6 +594,8 @@ InstructionDecoder::getFunctionCodeRTypeInstruction() const
       functionCode = InstructionMnemonic::L_MULD;
       break;
     case 0b1000:
+        // std::cout << "CHECKSOUT" << std::endl;
+        // std::cout << std::hex << getOp2() << std::endl;
       switch (getOp2()) {
         case 0b0000:
           functionCode = InstructionMnemonic::L_SLL;

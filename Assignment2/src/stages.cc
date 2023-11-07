@@ -43,7 +43,7 @@ InstructionFetchStage::propagate()
       // INPUT Instruction Memory - PC
       instructionMemory.setAddress(PC);
       instructionMemory.setSize(4);
-      std::cout << std::hex << PC << std::endl;
+      // std::cout << std::hex << PC << std::endl;
 
       PC += 4;
       
@@ -230,12 +230,12 @@ ExecuteStage::propagate()
   alu.setOp(CONTROL_SIGNALS.AluOp());
 
 
-    std::cout << "A: ";
-    std::cout << std::hex << mux1.getOutput() << std::endl;
-    std::cout << "B: ";
-    std::cout << std::hex << mux2.getOutput() << std::endl;
-    std::cout << "Result: ";
-    std::cout << std::hex << alu.getResult() << std::endl;
+    // std::cout << "A: ";
+    // std::cout << std::hex << mux1.getOutput() << std::endl;
+    // std::cout << "B: ";
+    // std::cout << std::hex << mux2.getOutput() << std::endl;
+    // std::cout << "Result: ";
+    // std::cout << std::hex << alu.getResult() << std::endl;
 
   FLAG = alu.getFlag();
   ZERO_FLAG = alu.getZeroFlag();

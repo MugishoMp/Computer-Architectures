@@ -130,12 +130,8 @@ ALUOp ControlSignals::AluOp() const
       break;
     case InstructionMnemonic::L_SRLI:
     case InstructionMnemonic::L_SRL:
-      // Perform ALU operation SHR
-      return ALUOp::SHR;
-      break;
     case InstructionMnemonic::L_SRA:
-      // Perform ALU operation SAR
-      std::cout << "TESTESTEST" << std::endl;
+      // Perform ALU operation SHR
       return ALUOp::SHR;
       break;
     case InstructionMnemonic::L_SFEQI:
@@ -155,6 +151,9 @@ ALUOp ControlSignals::AluOp() const
     case InstructionMnemonic::L_SFGES:
       // Perform ALU operation LTE
       return ALUOp::GTE;
+      break;
+    case InstructionMnemonic::L_SFLES:
+      return ALUOp::LTE;
       break;
     case InstructionMnemonic::L_NOP:
       // Perform ALU operation NOP
