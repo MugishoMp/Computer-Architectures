@@ -36,6 +36,11 @@ InstructionFetchStage::propagate()
       // INPUT PC - mux.getOutput();
       // OUTPUT PC - PC
 
+      // if branch decision is true then we turn on branch delay slot,
+      // we save the branch address and go to the address PC instead of 
+      // BRANCH PC
+      // if the branch delayslot is on we turn it of and switch back to 
+      // BRANCH PC
 
 
       PC = mux.getOutput();
