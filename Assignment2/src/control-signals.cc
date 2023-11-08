@@ -86,6 +86,7 @@ ALUOp ControlSignals::AluOp() const
     case InstructionMnemonic::L_LWZ:
     case InstructionMnemonic::L_SW:
     case InstructionMnemonic::L_LBZ:
+    case InstructionMnemonic::L_LBS:
     case InstructionMnemonic::L_SB:
       // Perform ALU operation ADD
       return ALUOp::ADD;
@@ -162,7 +163,7 @@ ALUOp ControlSignals::AluOp() const
 
     default:
       // Handle other cases or throw an exception
-      std::cerr << "ALU operation not supported: " << static_cast<int>(this->functionCode)<< std::endl;
+      std::cerr << "ALU not supported for instruction: " << static_cast<int>(this->functionCode)<< std::endl;
       break;
   }
 
@@ -322,6 +323,16 @@ bool ControlSignals::setLinkRegister() const
 {
   switch (this->functionCode) {
     case InstructionMnemonic::L_JAL:
+      return true;
+    default:
+      return false;
+  }
+}
+
+bool ControlSignals::signExtendedRead() const 
+{
+  switch (this->functionCode) {
+    case InstructionMnemonic::L_LBS:
       return true;
     default:
       return false;

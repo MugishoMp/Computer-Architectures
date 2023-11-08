@@ -19,6 +19,16 @@ InstructionFetchStage::propagate()
   try
     {
 
+      if (ex_m.BRANCH_DELAY_SLOT) {
+        // INPUT Instruction Memory - PC
+        instructionMemory.setAddress(PC);
+        instructionMemory.setSize(4);
+        // std::cout << std::hex << PC << std::endl;
+
+        PC += 4;
+      }
+      
+
       // INPUT ADD - PC + 4
       // OUTPUT ADD - NEXT_PC
       RegValue BRANCH_PC = ex_m.ALU_OUTPUT;
@@ -37,15 +47,16 @@ InstructionFetchStage::propagate()
       // OUTPUT PC - PC
 
 
-
       PC = mux.getOutput();
 
-      // INPUT Instruction Memory - PC
-      instructionMemory.setAddress(PC);
-      instructionMemory.setSize(4);
-      // std::cout << std::hex << PC << std::endl;
+      if (!ex_m.BRANCH_DELAY_SLOT) {
+        // INPUT Instruction Memory - PC
+        instructionMemory.setAddress(PC);
+        instructionMemory.setSize(4);
+        // std::cout << std::hex << PC << std::endl;
 
-      PC += 4;
+        PC += 4;
+      }
       
       instr = instructionMemory.getValue();
       /* Enable this once you have implemented instruction fetch. */
@@ -247,9 +258,13 @@ ExecuteStage::propagate()
   // INPUT FLAG TEST - id_ex.RS1 (if true switch to branch address)
   // INPUT FLAG TEST - id_ex.RS2 (if false take next address)
   // OUTPUT FLAG TEST BRANCH_DECISION
+  if (BRANCH_DELAY_SLOT) {
+    BRANCH_DELAY_SLOT = false;
+  }
   if (CONTROL_SIGNALS.jump(FLAG)){
     // std::cout << "We BRANCH" << std::endl;
     BRANCH_DECISION = InputSelectorIFStage::InputTwo;
+    BRANCH_DELAY_SLOT = true;
   } else {
     // std::cout << "We dont BRANCH" << std::endl;
     BRANCH_DECISION = InputSelectorIFStage::InputOne;
@@ -279,6 +294,8 @@ ExecuteStage::clockPulse()
 
   // Equality test
   ex_m.BRANCH_DECISION = BRANCH_DECISION;
+
+  ex_m.BRANCH_DELAY_SLOT = BRANCH_DELAY_SLOT;
 
   // ALU 
   ex_m.ALU_OUTPUT = alu.getResult();
@@ -322,7 +339,7 @@ MemoryStage::propagate()
     // std::cout << "BYTES read: " << (int) CONTROL_SIGNALS.getDataSize() << "AT PC: ";
     dataMemory.setReadEnable(true);
     // TODO do we want to sign extend
-    DATA_READ_FROM_MEMORY = dataMemory.getDataOut(false);
+    DATA_READ_FROM_MEMORY = dataMemory.getDataOut(CONTROL_SIGNALS.signExtendedRead());
   } else {
     dataMemory.setReadEnable(false);
   }
@@ -386,7 +403,6 @@ WriteBackStage::propagate()
   Mux<RegValue, InputSelectorWBStage> mux;
   mux.setInput(InputSelectorWBStage::InputOne, m_wb.DATA_READ_FROM_MEMORY);
   mux.setInput(InputSelectorWBStage::InputTwo, m_wb.ALU_RESULT);
-  // TODO control signal
   mux.setSelector(CONTROL_SIGNALS.isReadOp());
 
   // Registers INPUT 4(is is RegValue BTW!!!!)
