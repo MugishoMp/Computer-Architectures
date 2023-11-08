@@ -163,7 +163,7 @@ void ALU::updateFlags(RegValue result)
     // Sign flag (assuming RegValue is a signed type)
     signFlag = (result < 0);
     
-    flag = (flag & true);
+    flag = (((bool) result) & true);
 
     // Carry and Overflow flags would depend on the operation and would need to be
     // updated accordingly, possibly using additional information from the operation

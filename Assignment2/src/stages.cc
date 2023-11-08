@@ -238,6 +238,7 @@ ExecuteStage::propagate()
     // std::cout << std::hex << alu.getResult() << std::endl;
 
   FLAG = alu.getFlag();
+  // std::cout << "FLAG" << FLAG << std::endl;
   ZERO_FLAG = alu.getZeroFlag();
   SIGN_FLAG = alu.getSignFlag();
   CARRY_FLAG = alu.getCarryFlag();
@@ -247,8 +248,10 @@ ExecuteStage::propagate()
   // INPUT FLAG TEST - id_ex.RS2 (if false take next address)
   // OUTPUT FLAG TEST BRANCH_DECISION
   if (CONTROL_SIGNALS.jump(FLAG)){
+    // std::cout << "We BRANCH" << std::endl;
     BRANCH_DECISION = InputSelectorIFStage::InputTwo;
   } else {
+    // std::cout << "We dont BRANCH" << std::endl;
     BRANCH_DECISION = InputSelectorIFStage::InputOne;
   }
 
