@@ -52,6 +52,7 @@ public:
     uint8_t getDataSize() const;
     bool jump(bool FLAG) const;
     bool setLinkRegister() const;
+    bool signExtendedRead() const;
 
     // Setter methods for various control signals
     void setOpcode(uint16_t newOpCode) { this->opCode = newOpCode; };

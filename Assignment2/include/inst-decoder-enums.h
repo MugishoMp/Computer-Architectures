@@ -34,8 +34,10 @@ enum class InstructionMnemonic {
 	L_JR,
 	L_MACI,
 	L_LWA,
+	// zero extended read
 	L_LWZ,
 	L_LBZ,
+	// sign extended read
 	L_LBS,
 	L_ADDI,
 	L_ANDI,
@@ -55,7 +57,9 @@ enum class InstructionMnemonic {
 	L_SRA,
 	L_SFEQ,
 	L_SFNE,
-	L_SFGTU,
+	// unsigned comparison
+	L_SFGTU, 
+	// signed comparison
 	L_SFGTS,
 	L_SFGES,
 	L_SFLES,

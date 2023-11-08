@@ -58,6 +58,7 @@ struct EX_MRegisters
 
   RegValue BRANCH_PC{};
   InputSelectorIFStage BRANCH_DECISION{};
+  bool BRANCH_DELAY_SLOT{};
 };
 
 struct M_WBRegisters
@@ -246,6 +247,7 @@ class ExecuteStage : public Stage
     bool SIGN_FLAG{};
     bool CARRY_FLAG{};
     bool OVERFLOW_FLAG{};
+    bool BRANCH_DELAY_SLOT{};
 };
 
 /*
