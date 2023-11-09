@@ -145,13 +145,15 @@ class InstructionFetchStage : public Stage
                           const EX_MRegisters &ex_m,
                           IF_IDRegisters &if_id,
                           InstructionMemory instructionMemory,
-                          MemAddress &PC)
+                          MemAddress &PC, 
+                          HazardDetector &HAZARD_DETECTOR)
       : Stage(pipelining),
       ex_m(ex_m),
       if_id(if_id),
       instructionMemory(instructionMemory),
       PC(PC),
-      instr(0)
+      instr(0),
+      HAZARD_DETECTOR(HAZARD_DETECTOR)
     { }
 
     void propagate() override;
@@ -166,6 +168,7 @@ class InstructionFetchStage : public Stage
 
     /* TODO: add other necessary fields/buffers. */
     RegValue instr;
+    HazardDetector HAZARD_DETECTOR;
 };
 
 /*
@@ -182,7 +185,8 @@ class InstructionDecodeStage : public Stage
                            RegisterFile &regfile,
                            InstructionDecoder &decoder,
                            uint64_t &nInstrIssued,
-                           uint64_t &nStalls,
+                           uint64_t &nStalls, 
+                           HazardDetector &HAZARD_DETECTOR,
                            bool debugMode = false)
       : Stage(pipelining),
       if_id(if_id), m_wb(m_wb), id_ex(id_ex),
@@ -190,7 +194,8 @@ class InstructionDecodeStage : public Stage
       nInstrIssued(nInstrIssued), nStalls(nStalls),
       debugMode(debugMode),
       SIGN_EXTENDED_IMMEDIATE(0), // Assuming default initialization to 0
-      CONTROL_SIGNALS()
+      CONTROL_SIGNALS(),
+      HAZARD_DETECTOR(HAZARD_DETECTOR)
     { }
 
     void propagate() override;
@@ -214,6 +219,7 @@ class InstructionDecodeStage : public Stage
     /* TODO: add other necessary fields/buffers. */
     RegValue SIGN_EXTENDED_IMMEDIATE;
     ControlSignals CONTROL_SIGNALS;
+    HazardDetector HAZARD_DETECTOR;
 };
 
 /*
@@ -225,11 +231,13 @@ class ExecuteStage : public Stage
   public:
     ExecuteStage(bool pipelining,
                  const ID_EXRegisters &id_ex,
-                 EX_MRegisters &ex_m)
+                 EX_MRegisters &ex_m, 
+                HazardDetector &HAZARD_DETECTOR)
       : Stage(pipelining),
       id_ex(id_ex), ex_m(ex_m),
       alu(), // Default construction of ALU
-      CONTROL_SIGNALS() // Default construction of CONTROL_SIGNALS
+      CONTROL_SIGNALS(), // Default construction of CONTROL_SIGNALS
+      HAZARD_DETECTOR(HAZARD_DETECTOR)
     { }
 
     void propagate() override;
@@ -246,6 +254,7 @@ class ExecuteStage : public Stage
     RegNumber RD{};
     InputSelectorIFStage BRANCH_DECISION{};
     ControlSignals CONTROL_SIGNALS;
+    HazardDetector HAZARD_DETECTOR;
 
     // bool FLAG;     uninitializedFlag is not initialized here, so it has an 
     //                indeterminate value
@@ -268,10 +277,12 @@ class MemoryStage : public Stage
     MemoryStage(bool pipelining,
                 const EX_MRegisters &ex_m,
                 M_WBRegisters &m_wb,
-                DataMemory dataMemory)
+                DataMemory dataMemory, 
+                HazardDetector &HAZARD_DETECTOR)
       : Stage(pipelining),
       ex_m(ex_m), m_wb(m_wb), dataMemory(dataMemory),
-      CONTROL_SIGNALS() // Default construction of CONTROL_SIGNALS
+      CONTROL_SIGNALS(), // Default construction of CONTROL_SIGNALS
+      HAZARD_DETECTOR(HAZARD_DETECTOR)
     { }
 
     void propagate() override;
@@ -286,6 +297,7 @@ class MemoryStage : public Stage
     MemAddress PC{};
     /* TODO: add other necessary fields/buffers */
     ControlSignals CONTROL_SIGNALS;
+    HazardDetector HAZARD_DETECTOR;
     RegNumber RD{};
     RegValue ALU_RESULT{};
     RegValue DATA_READ_FROM_MEMORY{};
@@ -302,11 +314,13 @@ class WriteBackStage : public Stage
                    const M_WBRegisters &m_wb,
                    RegisterFile &regfile,
                    bool &flag,
-                   uint64_t &nInstrCompleted)
+                   uint64_t &nInstrCompleted, 
+                   HazardDetector &HAZARD_DETECTOR)
       : Stage(pipelining),
       m_wb(m_wb), regfile(regfile), flag(flag),
       nInstrCompleted(nInstrCompleted),
-      CONTROL_SIGNALS() // Default construction of CONTROL_SIGNALS
+      CONTROL_SIGNALS(), // Default construction of CONTROL_SIGNALS
+      HAZARD_DETECTOR(HAZARD_DETECTOR)
     { }
 
     void propagate() override;
@@ -320,6 +334,7 @@ class WriteBackStage : public Stage
 
     MemAddress PC{};
     ControlSignals CONTROL_SIGNALS;
+    HazardDetector HAZARD_DETECTOR;
     bool &flag;
     uint64_t &nInstrCompleted;
 };

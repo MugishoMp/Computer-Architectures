@@ -82,6 +82,7 @@ InstructionFetchStage::propagate()
 void
 InstructionFetchStage::clockPulse()
 {
+  HAZARD_DETECTOR;
   // OUTPUT Mux - mux.getOutput();
   if_id.PC = PC;
   
@@ -167,6 +168,8 @@ InstructionDecodeStage::propagate()
 
 void InstructionDecodeStage::clockPulse()
 {
+  HAZARD_DETECTOR;
+
   // PC
   id_ex.PC = PC;
 
@@ -290,6 +293,7 @@ ExecuteStage::clockPulse()
    * includes the result (output) of the ALU. For memory-operations
    * the ALU computes the effective memory address.
    */
+  HAZARD_DETECTOR;
 
   // PC
   ex_m.PC = PC;
@@ -367,7 +371,7 @@ MemoryStage::clockPulse()
 
   /* TODO: write necessary fields in pipeline register */
 
-
+  HAZARD_DETECTOR;
   m_wb.PC = PC;
 
   m_wb.DATA_READ_FROM_MEMORY = DATA_READ_FROM_MEMORY;
@@ -429,5 +433,6 @@ void
 WriteBackStage::clockPulse()
 {
   /* TODO: pulse the register file */
+  HAZARD_DETECTOR;
   regfile.clockPulse();
 }

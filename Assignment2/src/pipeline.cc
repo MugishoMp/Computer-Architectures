@@ -22,27 +22,34 @@ Pipeline::Pipeline(bool pipelining,
    * to more shared components.
    */
 
+  HazardDetector HAZARD_DETECTOR;
+
   stages.emplace_back(std::make_unique<InstructionFetchStage>(pipelining,
                                                               ex_m,
                                                               if_id,
                                                               instructionMemory,
-                                                              PC));
+                                                              PC, 
+                                                              HAZARD_DETECTOR));
   stages.emplace_back(std::make_unique<InstructionDecodeStage>(pipelining,
                                                                if_id, m_wb, id_ex,
                                                                regfile,
                                                                decoder,
                                                                nInstrIssued,
-                                                               nStalls,
+                                                               nStalls, 
+                                                               HAZARD_DETECTOR,
                                                                debugMode));
   stages.emplace_back(std::make_unique<ExecuteStage>(pipelining,
-                                                     id_ex, ex_m));
+                                                     id_ex, ex_m, 
+                                                     HAZARD_DETECTOR));
   stages.emplace_back(std::make_unique<MemoryStage>(pipelining,
                                                     ex_m, m_wb,
-                                                    dataMemory));
+                                                    dataMemory, 
+                                                    HAZARD_DETECTOR));
   stages.emplace_back(std::make_unique<WriteBackStage>(pipelining,
                                                        m_wb,
                                                        regfile, flag,
-                                                       nInstrCompleted));
+                                                       nInstrCompleted, 
+                                                       HAZARD_DETECTOR));
 }
 
 void
