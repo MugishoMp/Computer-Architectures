@@ -55,7 +55,7 @@ InputSelectorEXStage ControlSignals::BInput() const
     case 0x35:
     case 0x36:
     case 0x37:
-      // instruction contains an immeidate
+      // instruction contains an IMMEDIATE
       input = InputSelectorEXStage::InputTwo;
       break;
     default:
@@ -163,10 +163,11 @@ ALUOp ControlSignals::AluOp() const
 
     default:
       // Handle other cases or throw an exception
-      std::cerr << "ALU not supported for instruction: " << static_cast<int>(this->functionCode)<< std::endl;
+      std::cerr << "ALU not supported for instruction: " << static_cast<int>(this->functionCode) << std::endl;
+      return ALUOp::NONE;
       break;
   }
-
+  return ALUOp::NONE;
 }
 
 

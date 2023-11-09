@@ -117,7 +117,7 @@ InstructionDecodeStage::propagate()
   try {
     regfile.setRS1(decoder.getA());
   } catch (IllegalInstruction &e) {
-    regfile.setRS1(MaxRegs);
+    regfile.setRS1((RegNumber)MaxRegs);
     // the control signal rs1Input needs to return false;
   }
 
@@ -125,7 +125,7 @@ InstructionDecodeStage::propagate()
   try {
     regfile.setRS2(decoder.getB());
   } catch (IllegalInstruction &e) {
-    regfile.setRS2(MaxRegs);
+    regfile.setRS2((RegNumber)MaxRegs);
     // the control signal rs2Input needs to return false;
   }
 
@@ -137,9 +137,9 @@ InstructionDecodeStage::propagate()
 
   // Sign Extend INPUT 1
   try {
-    SIGN_EXTENDED_IMMEIDATE = decoder.getImmediate();
+    SIGN_EXTENDED_IMMEDIATE = decoder.getImmediate();
   } catch (IllegalInstruction &e) {
-    SIGN_EXTENDED_IMMEIDATE = 0;
+    SIGN_EXTENDED_IMMEDIATE = 0;
     // the control signal immediateInput needs to return false;
   }
 
@@ -178,7 +178,7 @@ void InstructionDecodeStage::clockPulse()
   id_ex.RS2 = regfile.getReadData2();
 
   // Sign Extend OUTPUT 1
-  id_ex.IMMEDIATE = SIGN_EXTENDED_IMMEIDATE;
+  id_ex.IMMEDIATE = SIGN_EXTENDED_IMMEDIATE;
 
   // Register RD
   try {
@@ -190,7 +190,7 @@ void InstructionDecodeStage::clockPulse()
       id_ex.RD = decoder.getD();
     }
   } catch (IllegalInstruction &e) {
-    id_ex.RD = MaxRegs;
+    id_ex.RD = (RegNumber) MaxRegs;
   }
 
   /* ignore the "instruction" in the first cycle. */

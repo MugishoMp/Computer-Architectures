@@ -95,7 +95,7 @@ ALU::getResult()
                 result = A >> B;
                 
                 // Manually set the empty higher-order bits
-                for (int i = 0; i < B; ++i) {
+                for (int i = 0; i < (int)B; ++i) {
                     result |= (1 << (sizeof(RegValue) * 8 - 1 - i));
                 }
             } else {
@@ -146,6 +146,9 @@ ALU::getResult()
             break;
         case ALUOp::B:
             result = B;
+            break;
+
+        case ALUOp::NONE:
             break;
     }
 

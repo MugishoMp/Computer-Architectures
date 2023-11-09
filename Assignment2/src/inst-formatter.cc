@@ -87,6 +87,9 @@ void printRBRTypeInstruction(std::ostream &os, const InstructionDecoder &decoder
     case InstructionMnemonic::L_JALR:
       os << "l.jalr" << " ";
       break;
+    default:
+      os << "unkown operation" << " ";
+
   }
   os << "r" << int(decoder.getB()) << " ";
 }
@@ -114,6 +117,8 @@ void printDAKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder
     case InstructionMnemonic::L_MFSPR:
       os << "l.mfspr" << " ";
       break;
+    default:
+      os << "unkown operation" << " ";
   }
   os << "r" << int(decoder.getD()) << ", ";
   os << "r" << int(decoder.getA()) << ", ";
@@ -143,6 +148,8 @@ void printSTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
     case InstructionMnemonic::L_SH:
       os << "l.sh" << " ";
       break;
+    default:
+      os << "unkown operation" << " ";
   }
   os << decoder.getImmediateI() << "(" << "r" << int(decoder.getA()) << ")" << ", ";
   os << "r" << int(decoder.getB()) << " ";
@@ -162,6 +169,8 @@ void printRABROTypeInstruction(std::ostream &os, const InstructionDecoder &decod
     case InstructionMnemonic::L_MSBU:
       os << "l.msbu" << " ";
       break;
+    default:
+      os << "unkown operation" << " ";
   }
   os << "r" << int(decoder.getA()) << ", ";
   os << "r" << int(decoder.getB()) << " ";
@@ -181,6 +190,8 @@ void printSHTypeInstruction(std::ostream &os, const InstructionDecoder &decoder)
     case InstructionMnemonic::L_RORI:
       os << "l.rori" << " ";
       break;
+    default:
+      os << "unkown operation" << " ";
   }
   os << "r" << int(decoder.getD()) << ", ";
   os << "r" << int(decoder.getA()) << ", ";
@@ -200,6 +211,8 @@ void printJTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
     case InstructionMnemonic::L_BF:
       os << "l.bf" << " ";
       break;
+    default:
+      os << "unkown operation" << " ";
   }
 
   // how do i know what the instruction address is?
@@ -226,6 +239,8 @@ void printOKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder)
     case InstructionMnemonic::L_CSYNC: 
       os << "l.csync" << " ";
       break;
+    default:
+      os << "unkown operation" << " ";
   }
 }
 void printRESTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
@@ -254,6 +269,8 @@ void printRESTypeInstruction(std::ostream &os, const InstructionDecoder &decoder
     case InstructionMnemonic::L_CUST8:
       os << "l.cust8" << " ";
       break;
+    default:
+      os << "unkown operation" << " ";
   }
 }
 void printFTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
@@ -289,6 +306,8 @@ void printFTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
     case InstructionMnemonic::L_SFLESI:
       os << "l.sflesi" << " ";
       break;
+    default:
+      os << "unkown operation" << " ";
   }
   os << "r" << int(decoder.getA()) << ", ";
   os << int(decoder.getImmediateI()) << " ";
@@ -326,6 +345,8 @@ void printOABRTypeInstruction(std::ostream &os, const InstructionDecoder &decode
     case InstructionMnemonic::L_SFLES:
       os << "l.sfles" << " ";
       break;
+    default:
+      os << "unkown operation" << " ";
   }
   os << "r" << int(decoder.getA()) << ", ";
   os << "r" << int(decoder.getB()) << " ";
@@ -372,6 +393,8 @@ void printITypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
     case InstructionMnemonic::L_MULI:
       os << "l.muli" << " ";
       break;
+    default:
+      os << "unkown operation" << " ";
   }
   os << "r" << int(decoder.getD()) << ", ";
   if (decoder.getOpcode() <= 0x26)
@@ -458,6 +481,8 @@ void printRTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
     case InstructionMnemonic::L_FL1:
       os << "l.fl1" << " ";
       break;
+    default:
+      os << "unkown operation" << " ";
 
   }
   if (int(decoder.getB()) != FIELD_NOT_AVAILABLE_8_BIT)

@@ -50,7 +50,9 @@ enum class ALUOp {
 
     SHIFT_ADD, // shift to left with two and add
     A, // return only A
-    B  // return only B
+    B, // return only B
+
+    NONE // do nothing
 };
 
 // Define the flags

@@ -150,7 +150,8 @@ class InstructionFetchStage : public Stage
       ex_m(ex_m),
       if_id(if_id),
       instructionMemory(instructionMemory),
-      PC(PC)
+      PC(PC),
+      instr(0)
     { }
 
     void propagate() override;
@@ -162,6 +163,8 @@ class InstructionFetchStage : public Stage
 
     InstructionMemory instructionMemory;
     MemAddress &PC;
+
+    /* TODO: add other necessary fields/buffers. */
     RegValue instr;
 };
 
@@ -182,10 +185,12 @@ class InstructionDecodeStage : public Stage
                            uint64_t &nStalls,
                            bool debugMode = false)
       : Stage(pipelining),
-      if_id(if_id), id_ex(id_ex), m_wb(m_wb),
+      if_id(if_id), m_wb(m_wb), id_ex(id_ex),
       regfile(regfile), decoder(decoder),
       nInstrIssued(nInstrIssued), nStalls(nStalls),
-      debugMode(debugMode)
+      debugMode(debugMode),
+      SIGN_EXTENDED_IMMEDIATE(0), // Assuming default initialization to 0
+      CONTROL_SIGNALS()
     { }
 
     void propagate() override;
@@ -205,8 +210,9 @@ class InstructionDecodeStage : public Stage
     bool debugMode;
 
     MemAddress PC{};
+    
     /* TODO: add other necessary fields/buffers. */
-    RegValue SIGN_EXTENDED_IMMEIDATE;
+    RegValue SIGN_EXTENDED_IMMEDIATE;
     ControlSignals CONTROL_SIGNALS;
 };
 
@@ -221,7 +227,9 @@ class ExecuteStage : public Stage
                  const ID_EXRegisters &id_ex,
                  EX_MRegisters &ex_m)
       : Stage(pipelining),
-      id_ex(id_ex), ex_m(ex_m)
+      id_ex(id_ex), ex_m(ex_m),
+      alu(), // Default construction of ALU
+      CONTROL_SIGNALS() // Default construction of CONTROL_SIGNALS
     { }
 
     void propagate() override;
@@ -262,7 +270,8 @@ class MemoryStage : public Stage
                 M_WBRegisters &m_wb,
                 DataMemory dataMemory)
       : Stage(pipelining),
-      ex_m(ex_m), m_wb(m_wb), dataMemory(dataMemory)
+      ex_m(ex_m), m_wb(m_wb), dataMemory(dataMemory),
+      CONTROL_SIGNALS() // Default construction of CONTROL_SIGNALS
     { }
 
     void propagate() override;
@@ -276,10 +285,10 @@ class MemoryStage : public Stage
 
     MemAddress PC{};
     /* TODO: add other necessary fields/buffers */
-    RegValue DATA_READ_FROM_MEMORY{};
-    RegValue ALU_RESULT{};
-    RegNumber RD{};
     ControlSignals CONTROL_SIGNALS;
+    RegNumber RD{};
+    RegValue ALU_RESULT{};
+    RegValue DATA_READ_FROM_MEMORY{};
 };
 
 /*
@@ -296,7 +305,8 @@ class WriteBackStage : public Stage
                    uint64_t &nInstrCompleted)
       : Stage(pipelining),
       m_wb(m_wb), regfile(regfile), flag(flag),
-      nInstrCompleted(nInstrCompleted)
+      nInstrCompleted(nInstrCompleted),
+      CONTROL_SIGNALS() // Default construction of CONTROL_SIGNALS
     { }
 
     void propagate() override;
@@ -304,15 +314,21 @@ class WriteBackStage : public Stage
 
   private:
     const M_WBRegisters &m_wb;
-
     RegisterFile &regfile;
-    bool &flag;
 
     /* TODO add other necessary fields/buffers and components */
 
     MemAddress PC{};
-    uint64_t &nInstrCompleted;
     ControlSignals CONTROL_SIGNALS;
+    bool &flag;
+    uint64_t &nInstrCompleted;
+};
+
+class HazardDetector {
+  public:
+
+  private:
+    
 };
 
 #endif /* __STAGES_H__ */
