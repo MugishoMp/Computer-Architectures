@@ -12,6 +12,7 @@ LDFLAGS = -lstdc++fs
 OBJECTS = \
 	alu.o \
 	config-file.o \
+	control-signals.o \
 	elf-file.o \
 	inst-decoder.o \
 	inst-formatter.o \
@@ -32,6 +33,7 @@ HEADERS = \
 	alu.h \
 	arch.h \
 	config-file.h \
+	control-signals.h \
 	elf-file.h \
 	inst-decoder.h \
 	memory.h \

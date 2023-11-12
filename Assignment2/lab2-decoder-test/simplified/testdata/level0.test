@@ -1,8 +1,0 @@
--X testdata/level0-instrs.txt
-0x9c880075	op=39 I-type D=4 A=8 imm=0x75
-0x9eab0010	op=39 I-type D=21 A=11 imm=0x10
-0x9c0dffec	op=39 I-type D=0 A=13 imm=0xffec
-0xe0a05002	op=56 R-type func=2 D=5 A=0 B=10
-0xe1090002	op=56 R-type func=2 D=8 A=9 B=0
-0xe3244002	op=56 R-type func=2 D=25 A=4 B=8
-0x15000000	op=5 NOP-type func=1 imm=0x0

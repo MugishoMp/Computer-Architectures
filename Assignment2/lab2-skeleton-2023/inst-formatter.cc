@@ -21,18 +21,7 @@ void printDNTypeInstruction(std::ostream &os, const InstructionDecoder &decoder)
 }
 void printORKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x05
-  os << "l.nop" << " ";
-  
-  // Create a stringstream
-  std::stringstream ss;
-
-  // Convert the integer to a hexadecimal string
-  ss << std::hex << int(decoder.getK());
-
-  // Get the hexadecimal string from the stringstream
-  std::string hexString = ss.str();
-
-  os << "0x" << hexString << " ";
+  os << "l.nop" << " $" << int(decoder.getK());
 }
 void printRAITypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x13
@@ -63,20 +52,10 @@ void printDROKTypeInstruction(std::ostream &os, const InstructionDecoder &decode
   else
     os << "l.movhi" << " ";
 
-  os << "r" << int(decoder.getD()) ;
+  os << "r" << int(decoder.getD())  ;
 
   if (decoder.getFunctionCode() == InstructionMnemonic::L_MOVHI) {
-    
-    // Create a stringstream
-    std::stringstream ss;
-
-    // Convert the integer to a hexadecimal string
-    ss << std::hex << int(decoder.getK());
-
-    // Get the hexadecimal string from the stringstream
-    std::string hexString = ss.str();
-
-    os << "0x" << hexString << " ";
+    os << ", r0, $" << int(decoder.getK());
   }
 }
 void printRBRTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
@@ -91,7 +70,7 @@ void printRBRTypeInstruction(std::ostream &os, const InstructionDecoder &decoder
       os << "unkown operation" << " ";
 
   }
-  os << "r" << int(decoder.getB()) << " ";
+  os << "r0, r0, r" << int(decoder.getB()) << " ";
 }
 // void printDABROOTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
 //   switch(decoder.getOpcode()) {
@@ -121,18 +100,8 @@ void printDAKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder
       os << "unkown operation" << " ";
   }
   os << "r" << int(decoder.getD()) << ", ";
-  os << "r" << int(decoder.getA()) << ", ";
+  os << "r" << int(decoder.getA()) << ", $" << int(decoder.getK());
 
-  // Create a stringstream
-  std::stringstream ss;
-
-  // Convert the integer to a hexadecimal string
-  ss << std::hex << int(decoder.getK());
-
-  // Get the hexadecimal string from the stringstream
-  std::string hexString = ss.str();
-
-  os << "0x" << hexString << " ";
 }
 void printSTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   switch(decoder.getFunctionCode()) {
@@ -151,8 +120,8 @@ void printSTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
     default:
       os << "unkown operation" << " ";
   }
-  os << decoder.getImmediateI() << "(" << "r" << int(decoder.getA()) << ")" << ", ";
-  os << "r" << int(decoder.getB()) << " ";
+  os << "r" << int(decoder.getB()) << ", ";
+  os << decoder.getImmediateI() << "(" << "r" << int(decoder.getA()) << ")" << " ";
 }
 void printRABROTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x31
@@ -217,7 +186,7 @@ void printJTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
 
   // how do i know what the instruction address is?
   // os << isntructionAddresss + (decoder.getImmediateN() << 2) << " ";
-  os << "(" << "<current instruction address> + " << decoder.getImmediateN() << ")" << " ";
+  os << (decoder.getImmediateN() << 2);
 }
 void printOKTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x08
@@ -277,34 +246,34 @@ void printFTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   // 0x2F
   switch(decoder.getFunctionCode()) {
     case InstructionMnemonic::L_SFEQI:
-      os << "l.sfeqi" << " ";
+      os << "l.sf eqi" << " ";
       break;
     case InstructionMnemonic::L_SFNEI:
-      os << "l.sfnei" << " ";
+      os << "l.sf nei" << " ";
       break;
     case InstructionMnemonic::L_SFGTUI:
-      os << "l.sfgtui" << " ";
+      os << "l.sf gtui" << " ";
       break;
     case InstructionMnemonic::L_SFGEUI:
-      os << "l.sfgeui" << " ";
+      os << "l.sf geui" << " ";
       break;
     case InstructionMnemonic::L_SFLTUI:
-      os << "l.sfltui" << " ";
+      os << "l.sf ltui" << " ";
       break;
     case InstructionMnemonic::L_SFLEUI:
-      os << "l.sfleui" << " ";
+      os << "l.sf leui" << " ";
       break;
     case InstructionMnemonic::L_SFGTSI:
-      os << "l.sfgtsi" << " ";
+      os << "l.sf gtsi" << " ";
       break;
     case InstructionMnemonic::L_SFGESI:
-      os << "l.sfgesi" << " ";
+      os << "l.sf gesi" << " ";
       break;
     case InstructionMnemonic::L_SFLTSI:
-      os << "l.sfltsi" << " ";
+      os << "l.sf ltsi" << " ";
       break;
     case InstructionMnemonic::L_SFLESI:
-      os << "l.sflesi" << " ";
+      os << "l.sf lesi" << " ";
       break;
     default:
       os << "unkown operation" << " ";
@@ -316,34 +285,34 @@ void printOABRTypeInstruction(std::ostream &os, const InstructionDecoder &decode
   // 0x39
   switch(decoder.getFunctionCode()) {
     case InstructionMnemonic::L_SFEQ:
-      os << "l.sfeq" << " ";
+      os << "l.sf eq" << " ";
       break;
     case InstructionMnemonic::L_SFNE:
-      os << "l.sfne" << " ";
+      os << "l.sf ne" << " ";
       break;
     case InstructionMnemonic::L_SFGTU:
-      os << "l.sfgtu" << " ";
+      os << "l.sf gtu" << " ";
       break;
     case InstructionMnemonic::L_SFGEU:
-      os << "l.sfgeu" << " ";
+      os << "l.sf geu" << " ";
       break;
     case InstructionMnemonic::L_SFLTU:
-      os << "l.sfltu" << " ";
+      os << "l.sf ltu" << " ";
       break;
     case InstructionMnemonic::L_SFLEU:
-      os << "l.sfleu" << " ";
+      os << "l.sf leu" << " ";
       break;
     case InstructionMnemonic::L_SFGTS:
-      os << "l.sfgts" << " ";
+      os << "l.sf gts" << " ";
       break;
     case InstructionMnemonic::L_SFGES:
-      os << "l.sfges" << " ";
+      os << "l.sf ges" << " ";
       break;
     case InstructionMnemonic::L_SFLTS:
-      os << "l.sflts" << " ";
+      os << "l.sf lts" << " ";
       break;
     case InstructionMnemonic::L_SFLES:
-      os << "l.sfles" << " ";
+      os << "l.sf les" << " ";
       break;
     default:
       os << "unkown operation" << " ";
@@ -400,7 +369,7 @@ void printITypeInstruction(std::ostream &os, const InstructionDecoder &decoder){
   if (decoder.getOpcode() <= 0x26)
     os << int(decoder.getImmediateI()) << "(" << "r" << int(decoder.getA()) << ")" << " ";
   else 
-    os << "r" << int(decoder.getA()) << ", " << int(decoder.getImmediateI()) << " ";
+    os << "r" << int(decoder.getA()) << ", $" << int(decoder.getImmediateI()) << " ";
 }
 
 void printRTypeInstruction(std::ostream &os, const InstructionDecoder &decoder){

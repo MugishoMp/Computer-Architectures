@@ -1,0 +1,13 @@
+The contents of the different pipeline registers and why it was necessary to put 
+these fields in the pipeline register.
+
+Which parts of your emulator do and do not work.
+
+Your approach to testing: which micro programs have been written and why?
+
+Any particular choices you have made for your implementation.
+
+For level 4: describe how you have dealt with delay slots in the non-pipelined case.
+
+For level 5: report for the different test programs the CPI with and without pipelining.
+How does it compare to the ideal CPI?

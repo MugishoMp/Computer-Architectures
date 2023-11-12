@@ -67,6 +67,8 @@ class Pipeline
     ID_EXRegisters id_ex{};
     EX_MRegisters  ex_m{};
     M_WBRegisters  m_wb{};
+
+    HazardDetector HAZARD_DETECTOR;
 };
 
 

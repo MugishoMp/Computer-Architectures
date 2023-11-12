@@ -1,8 +1,6 @@
 *.o
 rv64-emu
 .*.swp
-build/
-lib/googletest/*
 
 Windows/build/*
 !Windows/build/.gitkeep

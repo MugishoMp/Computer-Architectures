@@ -3,7 +3,7 @@
 
 
 ControlSignals::ControlSignals()
-  : opCode(), functionCode() 
+  : opCode(0x05), functionCode(InstructionMnemonic::L_NOP) 
 {
 }
 
