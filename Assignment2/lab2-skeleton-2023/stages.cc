@@ -314,8 +314,6 @@ MemoryStage::propagate()
 
   // size of the data, so either 1, 2 or 4 bytes
   if (CONTROL_SIGNALS.getDataSize() > 0) {
-    std::cout << "data Size: " << (int) CONTROL_SIGNALS.getDataSize() << std::endl;
-    std::cout << "data content: " << (int)(DATA) << std::endl;
     dataMemory.setSize(CONTROL_SIGNALS.getDataSize());
   }
 
@@ -323,6 +321,8 @@ MemoryStage::propagate()
   if (CONTROL_SIGNALS.isReadOpBool()) {
     dataMemory.setReadEnable(true);
     DATA_READ_FROM_MEMORY = dataMemory.getDataOut(CONTROL_SIGNALS.signExtendedRead());
+    std::cout << "data Size: " << (int) CONTROL_SIGNALS.getDataSize() << std::endl;
+    std::cout << "data content: " << (int)(DATA) << std::endl;
   } else {
     dataMemory.setReadEnable(false);
   }
