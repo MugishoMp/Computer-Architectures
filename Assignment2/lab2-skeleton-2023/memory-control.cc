@@ -6,6 +6,7 @@
  */
 
 #include "memory-control.h"
+#include <iostream>
 
 InstructionMemory::InstructionMemory(MemoryBus &bus)
   : bus(bus), size(0), addr(0)
@@ -87,6 +88,7 @@ RegValue
 DataMemory::getDataOut(bool signExtend) const
 {
   if (this->size == 1 && this->readEnable){
+    std::cout <<"TEWSTESTEST " << this->bus.readByte(this->addr) << std::endl;
     if (!signExtend) return this->bus.readByte(this->addr);
     else return (uint32_t)(int32_t)this->bus.readByte(this->addr);
 
