@@ -11,12 +11,12 @@
 .type _start, @function
 
 _start:
-    l.add r1, r2, r3
-    l.sub r2, r4, r5
-    l.and r3, r1, r2
-    l.or  r4, r1, r2
-    l.sll r5, r4, r3
-    l.srl r6, r2, r3
+    l.addi r1, r2, 0x3
+    l.subi r2, r4, 0x2
+    l.andi r3, r1, 0xa
+    l.ori  r4, r1, 0xa
+    l.slli r5, r4, 0x3
+    l.srli r6, r2, 0x3
     l.nop
     l.nop
     l.nop
