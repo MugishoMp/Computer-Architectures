@@ -84,6 +84,7 @@ ALUOp ControlSignals::AluOp() const
     case InstructionMnemonic::L_ADDI:
     case InstructionMnemonic::L_ADD:
     case InstructionMnemonic::L_LWZ:
+    case InstructionMnemonic::L_LWA:
     case InstructionMnemonic::L_SW:
     case InstructionMnemonic::L_LBZ:
     case InstructionMnemonic::L_LBS:
@@ -183,6 +184,7 @@ bool ControlSignals::regWriteInput() const
 
     // Load Instructions
     case InstructionMnemonic::L_LWZ:
+    case InstructionMnemonic::L_LWA:
     case InstructionMnemonic::L_LBZ:
     case InstructionMnemonic::L_LBS:
 
