@@ -10,8 +10,6 @@ _start:
     l.or  r4, r1, r2
     l.sll r5, r4, r3
     l.srl r6, r2, r3
-    l.sfeq r7, r4, r5
-    l.sfgtu r8, r5, r4
     l.nop
     l.nop
     l.nop
