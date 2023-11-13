@@ -14,9 +14,9 @@ end_program:
 _start:
     l.addi r2, r0, 1
     l.addi r3, r0, 1
-    l.sfles r3, r2
+    l.sfges r3, r2
     l.bnf end_program
     l.addi r2, r0, 0xffff
-    l.sfles r2, r3
+    l.sfges r3, r2
     l.bf end_program
     l.nop
