@@ -26,5 +26,6 @@ _start:
        l.lwa r5,8(r1)             # 65534
        l.lbs r6,12(r1)             # -1
        l.lbz r8,8(r1)             # 255
+       l.lwa r10,8(r1)             # 65534
        .word  0x40ffccff
        .size   _start, .-_start
