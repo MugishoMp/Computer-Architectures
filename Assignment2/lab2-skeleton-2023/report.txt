@@ -3,14 +3,55 @@ these fields in the pipeline register.
 
 Which parts of your emulator do and do not work.
 
-Your approach to testing: which micro programs have been written and why?
+# Your approach to testing: which micro programs have been written and why?:
+Prioritizing micro programs that handle basic and often used instructions is how
+I tested my OpenRisc 1000 emulator to make sure it is reliable and accurate. The 
+micro programs that were chosen offer a variety of features. The no-operation 
+(L_NOP) test confirms that the emulator can smoothly carry out simple commands. 
+Immediate value loading (L_MOVHI), which guarantees the proper loading of a 
+32-bit immediate's high portion into a register, is another crucial component.
 
-lbs and lbz do not work because in the given skeleton code getbyte from the bus
-returns 0, even though we know that there is a value at that position!
+Furthermore, tests for linking and branching instructions (L_J and L_JAL) are 
+essential for evaluating how well the emulator can manage control flow 
+activities. Micro programs for load and store instructions (L_LWZ, L_LBZ, L_LBS, 
+L_SW, L_SB, and L_SH) are also included in the suite to verify the emulator's 
+ability to correctly load and store data in memory.
 
-Any particular choices you have made for your implementation.
+To make sure that basic arithmetic, logical, and comparison operations are 
+carried out correctly, arithmetic instructions (L_ADD, L_SUB, L_AND, L_OR, 
+L_SLL, L_SRL) and comparison instructions (L_SFEQ, L_SFNE, L_SFGTU, L_SFGTS, 
+L_SFGES, L_SFLES) are checked.
+
+Additionally, the selection includes evaluating how the emulator handles 
+immediate arithmetic operations (L_ADDI, L_ANDI, and L_ORI) and jump 
+instructions to registers (L_JR). This all-encompassing method covers many 
+facets of control flow, memory access, arithmetic, and logic operations with \
+the goal of offering a strong basis for testing.
+
+I also learned that there could be an issue with the skeleton code that was 
+provided to us for this assignment from these unit tests. Because trying to 
+retrieve a single byte from the bus in the provided skeleton code returns 0, 
+even though we know that there is a value at that point, so lbs and lbz do not 
+function!
+
+# Any particular choices you have made for your implementation.
+Some of the "pre-" bit shifting, which happen in l.movhi for example happen in 
+the ALU, occurred because, when I first started working on this project, I was 
+told that there was no need to do this in the decoder, but I subsequently found 
+out that this was untrue. And because I was already rather far along with the 
+emulator's implementation, I decided to perform this shifting in the ALU before 
+the actual ALU operation happened as an interim solution. Therefore, some of the
+commands, like Movhi, technically take more clock cycles then on paper.
+
+In the case of the pipeline itself, I concentrated primarily on carrying out the 
+instructions that I discovered in the dump.txt files for every test. All 1000 
+OpenRISC instructions can be printed by the instruction formatter, though.
+
+
 
 For level 4: describe how you have dealt with delay slots in the non-pipelined case.
+
+
 
 For level 5: report for the different test programs the CPI with and without pipelining.
 How does it compare to the ideal CPI?
