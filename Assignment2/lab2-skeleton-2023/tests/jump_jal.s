@@ -7,8 +7,9 @@ _start:
     l.add r1, r1, r2
     l.add r1, r1, r3
     l.j target_label
-    l.add r1, r1, r4
-    l.add r1, r1, r5
+    l.nop
+    l.nop
+    l.nop
 
 target_label:
     l.jal link_target_label
