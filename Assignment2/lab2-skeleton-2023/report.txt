@@ -5,6 +5,9 @@ Which parts of your emulator do and do not work.
 
 Your approach to testing: which micro programs have been written and why?
 
+lbs and lbz do not work because in the given skeleton code getbyte from the bus
+returns 0, even though we know that there is a value at that position!
+
 Any particular choices you have made for your implementation.
 
 For level 4: describe how you have dealt with delay slots in the non-pipelined case.

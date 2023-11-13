@@ -88,8 +88,6 @@ RegValue
 DataMemory::getDataOut(bool signExtend) const
 {
   if (this->size == 1 && this->readEnable){
-    std::cout <<"TEWSTESTEST1 " << (int) this->addr << std::endl;
-    std::cout <<"TEWSTESTEST2 " << (int) this->bus.readByte(this->addr) << std::endl;
     if (!signExtend) return this->bus.readByte(this->addr);
     else return (uint32_t)(int32_t)this->bus.readByte(this->addr);
 
