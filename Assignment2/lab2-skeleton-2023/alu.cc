@@ -129,6 +129,22 @@ ALU::getResult()
             result = (A >= B);
             updateFlags(result);
             break;
+        case ALUOp::LTS:
+            result = ((int32_t)A < (int32_t)B);
+            updateFlags(result);
+            break;
+        case ALUOp::LTES:
+            result = ((int32_t)A <= (int32_t)B);
+            updateFlags(result);
+            break;
+        case ALUOp::GTS:
+            result = ((int32_t)A > (int32_t)B);
+            updateFlags(result);
+            break;
+        case ALUOp::GTES:
+            result = ((int32_t)A >= (int32_t)B);
+            updateFlags(result);
+            break;
 
         // Other Operations
         case ALUOp::INC:

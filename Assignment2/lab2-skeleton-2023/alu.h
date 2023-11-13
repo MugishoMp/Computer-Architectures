@@ -43,6 +43,11 @@ enum class ALUOp {
     LTE,  // Less Than or Equal
     GT,   // Greater Than
     GTE,  // Greater Than or Equal
+    
+    LTS,   // Less Than
+    LTES,  // Less Than or Equal
+    GTS,   // Greater Than
+    GTES,  // Greater Than or Equal
 
     // Other Operations
     INC,  // Increment

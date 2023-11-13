@@ -146,9 +146,12 @@ ALUOp ControlSignals::AluOp() const
       return ALUOp::NEQ;
       break;
     case InstructionMnemonic::L_SFGTU:
-    case InstructionMnemonic::L_SFGTS:
       // Perform ALU operation LT
       return ALUOp::GT;
+      break;
+    case InstructionMnemonic::L_SFGTS:
+      // Perform ALU operation LT
+      return ALUOp::GTS;
       break;
     case InstructionMnemonic::L_SFGES:
       // Perform ALU operation LTE
