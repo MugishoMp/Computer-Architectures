@@ -322,7 +322,7 @@ MemoryStage::propagate()
     dataMemory.setReadEnable(true);
     DATA_READ_FROM_MEMORY = dataMemory.getDataOut(CONTROL_SIGNALS.signExtendedRead());
     std::cout << "data Size: " << (int) CONTROL_SIGNALS.getDataSize() << std::endl;
-    std::cout << "data content: " << (int)(DATA) << std::endl;
+    std::cout << "data content: " << (int)(DATA_READ_FROM_MEMORY) << std::endl;
   } else {
     dataMemory.setReadEnable(false);
   }
