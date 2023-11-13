@@ -12,7 +12,6 @@ _start:
     l.srl r6, r2, r3
     l.sfeq r7, r4, r5
     l.sfgtu r8, r5, r4
-
     l.nop
     l.nop
     l.nop
