@@ -306,14 +306,18 @@ MemoryStage::propagate()
   PC = ex_m.PC;
   CONTROL_SIGNALS = ex_m.CONTROL_SIGNALS;
   RegValue DATA = ex_m.RS2;
+
   RegValue EFFECTIVE_ADDRESS = ex_m.ALU_OUTPUT;
 
   dataMemory.setDataIn(DATA);
   dataMemory.setAddress(EFFECTIVE_ADDRESS);
 
   // size of the data, so either 1, 2 or 4 bytes
-  if (CONTROL_SIGNALS.getDataSize() > 0) 
+  if (CONTROL_SIGNALS.getDataSize() > 0) {
+    std::cout << "data Size: " << (int) CONTROL_SIGNALS.getDataSize() << std::endl;
+    std::cout << "data content: " << (int)(DATA) << std::endl;
     dataMemory.setSize(CONTROL_SIGNALS.getDataSize());
+  }
 
   //read
   if (CONTROL_SIGNALS.isReadOpBool()) {
