@@ -23,8 +23,8 @@ _start:
        l.lwz r2,0(r1)             # 10
        l.lwz r3,4(r1)             # 20
        l.lwz r4,8(r1)             # 65534
-       l.lwa r5,8(r1)             # 65535
-       l.lbs r6,8(r1)             # -1
+       l.lwa r5,8(r1)             # 65534
+       l.lbs r6,12(r1)             # -1
        l.lbz r8,8(r1)             # 255
        .word  0x40ffccff
        .size   _start, .-_start
