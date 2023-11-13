@@ -204,7 +204,7 @@ bool ControlSignals::regWriteInput() const
 
     case InstructionMnemonic::L_AND:
     case InstructionMnemonic::L_SRL:
-      std::cerr << "regWriteInput::instruction not implemented" << std::endl;
+      return true;
     // For all other instructions
     default:
       return false;
