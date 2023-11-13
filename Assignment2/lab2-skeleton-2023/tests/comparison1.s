@@ -11,8 +11,7 @@ _start:
     l.addi r3, r0, 1
     l.sfeq r1, r2, r3
     l.bf end_program
-    l.nop  
-
+    l.nop
 
 end_program:
     l.addi r4, r0, 66
