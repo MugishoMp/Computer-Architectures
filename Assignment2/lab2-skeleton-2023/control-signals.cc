@@ -155,10 +155,10 @@ ALUOp ControlSignals::AluOp() const
       break;
     case InstructionMnemonic::L_SFGES:
       // Perform ALU operation LTE
-      return ALUOp::GTE;
+      return ALUOp::GTES;
       break;
     case InstructionMnemonic::L_SFLES:
-      return ALUOp::LTE;
+      return ALUOp::LTES;
       break;
     case InstructionMnemonic::L_NOP:
       // Perform ALU operation NOP
