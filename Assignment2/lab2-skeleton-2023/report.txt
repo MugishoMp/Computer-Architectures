@@ -2,6 +2,7 @@ The contents of the different pipeline registers and why it was necessary to put
 these fields in the pipeline register.
 
 Which parts of your emulator do and do not work.
+My emulator works up until level 4 level 5 and beyond do not work, so 
 
 # Your approach to testing: which micro programs have been written and why?:
 Prioritizing micro programs that handle basic and often used instructions is how
@@ -49,8 +50,16 @@ OpenRISC instructions can be printed by the instruction formatter, though.
 
 
 
-For level 4: describe how you have dealt with delay slots in the non-pipelined case.
-
+#For level 4: describe how you have dealt with delay slots in the non-pipelined case.
+In order to cope with delay slots, I have set the PC's instruction memory 
+address either before or after we set the PC with the output of the mux that 
+determines whether we want to take the branch PC or the next PC. We take this 
+action prior to deciding on the next PC in the event of a branch delay slot. As 
+a result, in the event of a branch PC, we must successfully complete every 
+pipeline stage before returning with the branch PC already installed in the 
+instruction memory. In the execute stage, we determine whether or not there is a 
+branch delay slot and whether or not we need to jump after this instruction. 
+Which is synonymous with each other.
 
 
 For level 5: report for the different test programs the CPI with and without pipelining.
