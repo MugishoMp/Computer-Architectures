@@ -321,6 +321,7 @@ MemoryStage::propagate()
   if (CONTROL_SIGNALS.isReadOpBool()) {
     dataMemory.setReadEnable(true);
     DATA_READ_FROM_MEMORY = dataMemory.getDataOut(CONTROL_SIGNALS.signExtendedRead());
+    std::cout << "EA: " << (int) EFFECTIVE_ADDRESS << std::endl;
     std::cout << "data Size: " << (int) CONTROL_SIGNALS.getDataSize() << std::endl;
     std::cout << "data content: " << (int)(DATA_READ_FROM_MEMORY) << std::endl;
   } else {
