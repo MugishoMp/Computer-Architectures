@@ -13,7 +13,7 @@
        .align 8
        .local  A
 A:
-       .int 10, 20, 30, 40, 50, 60, 70, 80
+       .int 10, 20, 65534, 65535, 50, 60, 70, 80
        .size   A, .-A
        .text
        .align 4
@@ -22,6 +22,9 @@ A:
 _start:
        l.lwz r2,0(r1)             # 10
        l.lwz r3,4(r1)             # 20
-       l.lwz r4,8(r1)             # 30
+       l.lwz r4,8(r1)             # 65534
+       l.lwa r5,8(r1)             # 65535
+       l.lbs r6,8(r1)             # -1
+       l.lbz r8,8(r1)             # 255
        .word  0x40ffccff
        .size   _start, .-_start
