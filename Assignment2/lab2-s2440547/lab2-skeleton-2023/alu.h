@@ -81,30 +81,34 @@ class ALU
     void setA(RegValue A) { this->A = A; }
     void setB(RegValue B) { this->B = B; }
     void setOp(ALUOp op) { this->op = op; }
-
+    
+    // Method to retrieve the result of the ALU operation
     RegValue getResult();
 
     // Methods to retrieve the status of the flags
-    bool getFlag() const { return flag; }
-    bool getZeroFlag() const { return zeroFlag; }
-    bool getSignFlag() const { return signFlag; }
-    bool getCarryFlag() const { return carryFlag; }
-    bool getOverflowFlag() const { return overflowFlag; }
+    bool getFlag() const { return flag; }              // General purpose flag
+    bool getZeroFlag() const { return zeroFlag; }      // Flag indicating zero result
+    bool getSignFlag() const { return signFlag; }      // Flag indicating negative result
+    bool getCarryFlag() const { return carryFlag; }    // Flag indicating a carry in arithmetic operations
+    bool getOverflowFlag() const { return overflowFlag; }  // Flag indicating overflow in arithmetic operations
+
 
   private:
+    // Input operands for the ALU operation
     RegValue A;
     RegValue B;
 
+    // Operation to be performed by the ALU
     ALUOp op;
 
-    // Flags
-    bool flag = false;
-    bool zeroFlag = false;
-    bool signFlag = false;
-    bool carryFlag = false;
-    bool overflowFlag = false;
-    
-    // Method to update flags
+    // Flags to represent different conditions after ALU operation
+    bool flag = false;          // General purpose flag
+    bool zeroFlag = false;      // Flag indicating zero result
+    bool signFlag = false;      // Flag indicating negative result
+    bool carryFlag = false;     // Flag indicating a carry in arithmetic operations
+    bool overflowFlag = false;  // Flag indicating overflow in arithmetic operations
+
+    // Method to update flags based on the result of the ALU operation
     void updateFlags(RegValue result);
 };
 

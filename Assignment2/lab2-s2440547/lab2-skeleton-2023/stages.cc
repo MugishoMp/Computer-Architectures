@@ -22,8 +22,6 @@ InstructionFetchStage::propagate()
       // INPUT Instruction Memory - PC
       instructionMemory.setAddress(PC);
       instructionMemory.setSize(4);
-      // std::cout << std::hex << PC - 4 << std::endl;
-
       PC += 4;
     }
     
@@ -40,8 +38,6 @@ InstructionFetchStage::propagate()
       // INPUT Instruction Memory - PC
       instructionMemory.setAddress(PC);
       instructionMemory.setSize(4);
-      // std::cout << std::hex << PC - 4 << std::endl;
-
       PC += 4;
     }
     
@@ -50,9 +46,6 @@ InstructionFetchStage::propagate()
     if (instr == TestEndMarker)
       throw TestEndMarkerEncountered(PC);
 
-
-  // std::cout << std::endl;
-  // std::cout << "PC PROPAGATE: " << std::hex << PC - 4 << std::endl;
   }
   catch (TestEndMarkerEncountered &e)
   {
@@ -67,14 +60,7 @@ InstructionFetchStage::propagate()
 void
 InstructionFetchStage::clockPulse()
 {
-  // std::cout << std::endl;
-  // std::cout << "PC CLOCK PULSE - IF: " << std::hex << PC - 4 << std::endl;
-  // by doing this check is DataHazard BEFORE we actually set the pipeline 
-  // register values we KNOW what is currently in the next stage
   if(pipelining && HAZARD_DETECTOR.isDataHazard()) {
-    // std::cout << "HAZARD AT PC - IF stage: " << std::hex << PC - 4 << std::endl;
-    // PC -= 4;
-    // return;
   }
 
   // PC
@@ -104,6 +90,7 @@ InstructionDecodeStage::propagate()
 
   // decode instruction
   decoder.setInstructionWord(if_id.INSTRUCTION_WORD);
+
   // set control signals
   CONTROL_SIGNALS.setOpcode(decoder.getOpcode());
   CONTROL_SIGNALS.setFunctionCode(decoder.getFunctionCode());
@@ -136,7 +123,6 @@ InstructionDecodeStage::propagate()
     SIGN_EXTENDED_IMMEDIATE = decoder.getImmediate();
   } catch (IllegalInstruction &e) {
     SIGN_EXTENDED_IMMEDIATE = 0;
-    // the control signal immediateInput needs to return false;
   }
 
   /* debug mode: dump decoded instructions to cerr.
@@ -161,21 +147,13 @@ InstructionDecodeStage::propagate()
 
 void InstructionDecodeStage::clockPulse()
 {
-  // std::cout << "PC CLOCK PULSE - ID: " << std::hex << PC - 4 << std::endl;
   if(pipelining && HAZARD_DETECTOR.isDataHazard()) {
-    // std::cout << "HAZARD AT PC - ID stage: " << std::hex << PC - 4 << std::endl;
-    // ControlSignals TEMP_CONTROL_SIGNALS;
-    // TEMP_CONTROL_SIGNALS.setOpcode(0x05);
-    // TEMP_CONTROL_SIGNALS.setFunctionCode(InstructionMnemonic::L_NOP);
-    // id_ex.CONTROL_SIGNALS = TEMP_CONTROL_SIGNALS;
-
-    // return;
   }
 
   // PC
   id_ex.PC = PC;
 
-
+  // register numbers of the input registers
   id_ex.A = A;
   id_ex.B = B;
 
@@ -225,36 +203,41 @@ ExecuteStage::propagate()
   // CONTROL_SIGNALS
   CONTROL_SIGNALS = id_ex.CONTROL_SIGNALS;
 
+  // Mux 1 - input A of the ALU
   Mux<RegValue, InputSelectorEXStage> mux1;
   mux1.setInput(InputSelectorEXStage::InputOne, PC);
   mux1.setInput(InputSelectorEXStage::InputTwo, id_ex.RS1);
   mux1.setSelector(CONTROL_SIGNALS.AInput());
   
+  // Mux 2 - input B of the ALU
   Mux<RegValue, InputSelectorEXStage> mux2;
   mux2.setInput(InputSelectorEXStage::InputOne, id_ex.RS2);
   mux2.setInput(InputSelectorEXStage::InputTwo, id_ex.IMMEDIATE);
   mux2.setSelector(CONTROL_SIGNALS.BInput());
 
+  // ALU
   alu.setA(mux1.getOutput());
   alu.setB(mux2.getOutput());
   alu.setOp(CONTROL_SIGNALS.AluOp());
 
+  // setting the flags after ALU operation
   FLAG = alu.getFlag();
-  // std::cout << "FLAG" << FLAG << std::endl;
   ZERO_FLAG = alu.getZeroFlag();
   SIGN_FLAG = alu.getSignFlag();
   CARRY_FLAG = alu.getCarryFlag();
   OVERFLOW_FLAG = alu.getOverflowFlag();
 
+
+  // Check to see if we are already in a branch delay slot, if so reset the flag
   if (BRANCH_DELAY_SLOT) {
     BRANCH_DELAY_SLOT = false;
   }
+
+  // Deciding if we need to jump after this instruction
   if (CONTROL_SIGNALS.jump(FLAG)){
-    // std::cout << "We BRANCH" << std::endl;
     BRANCH_DECISION = InputSelectorIFStage::InputTwo;
     BRANCH_DELAY_SLOT = true;
   } else {
-    // std::cout << "We dont BRANCH" << std::endl;
     BRANCH_DECISION = InputSelectorIFStage::InputOne;
   }
 
@@ -269,10 +252,7 @@ ExecuteStage::propagate()
 void
 ExecuteStage::clockPulse()
 {
-  // std::cout << "PC CLOCK PULSE - EX: " << std::hex << PC - 4 << std::endl;
   if(pipelining && HAZARD_DETECTOR.isDataHazard()) {
-    // std::cout << "HAZARD AT PC - EX stage: " << std::hex << PC - 4 << std::endl;
-    // return;
   }
 
   // PC
@@ -283,6 +263,8 @@ ExecuteStage::clockPulse()
 
   // branch test
   ex_m.BRANCH_DECISION = BRANCH_DECISION;
+
+  // branch delay slot
   ex_m.BRANCH_DELAY_SLOT = BRANCH_DELAY_SLOT;
 
   // ALU 
@@ -303,29 +285,37 @@ ExecuteStage::clockPulse()
 void
 MemoryStage::propagate()
 {
+  // PC
   PC = ex_m.PC;
-  CONTROL_SIGNALS = ex_m.CONTROL_SIGNALS;
-  RegValue DATA = ex_m.RS2;
 
+  // CONTROL_SIGNALS
+  CONTROL_SIGNALS = ex_m.CONTROL_SIGNALS;
+
+  // Data to be written to memory
+  RegValue DATA = ex_m.RS2;
+  // Effective Address
   RegValue EFFECTIVE_ADDRESS = ex_m.ALU_OUTPUT;
 
+  // set the right values if we want to write to memory
   dataMemory.setDataIn(DATA);
   dataMemory.setAddress(EFFECTIVE_ADDRESS);
 
-  // size of the data, so either 1, 2 or 4 bytes
+  // size of the data to be read from memory, so either 1, 2 or 4 bytes
   if (CONTROL_SIGNALS.getDataSize() > 0) {
     dataMemory.setSize(CONTROL_SIGNALS.getDataSize());
   }
 
-  //read
+  // read from memory
   if (CONTROL_SIGNALS.isReadOpBool()) {
     dataMemory.setReadEnable(true);
     DATA_READ_FROM_MEMORY = dataMemory.getDataOut(CONTROL_SIGNALS.signExtendedRead());
   } else {
     dataMemory.setReadEnable(false);
   }
-
   dataMemory.setWriteEnable(CONTROL_SIGNALS.isWriteOpBool());
+
+  // The result that we got out of the ALU in the previious clock cycle of this
+  // instruction
   ALU_RESULT = ex_m.ALU_OUTPUT;
 
   // RD
@@ -336,14 +326,13 @@ MemoryStage::propagate()
 void
 MemoryStage::clockPulse()
 {
-  // std::cout << "PC CLOCK PULSE - MEM: " << std::hex << PC - 4 << std::endl;
   if(pipelining && HAZARD_DETECTOR.isDataHazard()) {
-    // std::cout << "HAZARD AT PC - MEM stage: " << std::hex << PC - 4 << std::endl;
-    // return;
   }
 
+  // PC
   m_wb.PC = PC;
 
+  // DATA READ FROM MEMORY
   m_wb.DATA_READ_FROM_MEMORY = DATA_READ_FROM_MEMORY;
 
   // OUTPUT Data Memory
@@ -392,16 +381,10 @@ WriteBackStage::propagate()
 void
 WriteBackStage::clockPulse()
 {
-  // std::cout << "PC CLOCK PULSE - WB: " << std::hex << PC - 4 << std::endl;
-  
   if(pipelining && HAZARD_DETECTOR.isDataHazard()) {
-    // std::cout << "HAZARD AT PC - WB stage: " << std::hex << PC - 4 << std::endl;
-    // do nothing, let this stage write
   }
 
   regfile.clockPulse();
-
-  // HAZARD_DETECTOR.detectDataHazard();
 }
 
 

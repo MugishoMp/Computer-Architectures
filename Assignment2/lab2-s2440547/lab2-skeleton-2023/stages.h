@@ -37,12 +37,25 @@ struct ID_EXRegisters
   MemAddress PC{};
 
   /* TODO: add necessary fields */
+  // Register values for the first source operand
   RegValue RS1{};
+
+  // Register values for the second source operand
   RegValue RS2{};
+
+  // Destination register where the result will be stored
   RegNumber RD{0};
+
+  // Operand A for the ALU operation
   RegNumber A{0};
+
+  // Operand B for the ALU operation
   RegNumber B{0};
+
+  // Sign-extended immediate value from the instruction
   RegValue IMMEDIATE{};
+
+  // Control signals guiding the execution of the instruction
   ControlSignals CONTROL_SIGNALS;
 };
 
@@ -51,15 +64,25 @@ struct EX_MRegisters
   MemAddress PC{};
 
   /* TODO: add necessary fields */
+  // Control signals guiding the execution of the instruction
   ControlSignals CONTROL_SIGNALS;
-  // zero? output
-  // ALU output
+
+  // Output of the ALU operation
   RegValue ALU_OUTPUT{};
+
+  // Value of the second source operand
   RegValue RS2{};
+
+  // Destination register where the result will be stored
   RegNumber RD{0};
 
+  // Program Counter (PC) value for a branch instruction
   RegValue BRANCH_PC{};
+
+  // Decision on whether to take the branch or not
   InputSelectorIFStage BRANCH_DECISION{InputSelectorIFStage::InputOne};
+
+  // Flag indicating the presence of a branch delay slot
   bool BRANCH_DELAY_SLOT{};
 };
 
@@ -191,9 +214,11 @@ class InstructionFetchStage : public Stage
     MemAddress &PC;
 
     /* TODO: add other necessary fields/buffers. */
+    // Variable to store the current instruction
     RegValue instr;
+
+    // Reference to the Hazard Detector, which identifies hazards in the pipeline
     const HazardDetector &HAZARD_DETECTOR;
-    // HazardDetector HAZARD_DETECTOR;
 };
 
 /*
@@ -244,13 +269,20 @@ class InstructionDecodeStage : public Stage
     MemAddress PC{};
     
     /* TODO: add other necessary fields/buffers. */
+    // Variable to store the sign-extended immediate value
     RegValue SIGN_EXTENDED_IMMEDIATE;
+
+    // Control signals for the pipeline stage
     ControlSignals CONTROL_SIGNALS;
+
+    // Reference to the Hazard Detector, which identifies hazards in the pipeline
     const HazardDetector &HAZARD_DETECTOR;
 
+    // Register A
     RegNumber A{};
+
+    // Register B
     RegNumber B{};
-    // HazardDetector HAZARD_DETECTOR;
 };
 
 /*
@@ -281,20 +313,38 @@ class ExecuteStage : public Stage
     MemAddress PC{};
     /* TODO: add other necessary fields/buffers and components (ALU anyone?) */
     ALU alu;
+
+    // Register RS2 for the pipeline stage
     RegValue RS2{};
+
+    // Register RD to store the result of ALU operations
     RegNumber RD{0};
+
+    // Branch decision based on the control signals and flags
     InputSelectorIFStage BRANCH_DECISION{};
+
+    // Control signals for the pipeline stage
     ControlSignals CONTROL_SIGNALS;
+
+    // Reference to the Hazard Detector, which identifies hazards in the pipeline
     const HazardDetector &HAZARD_DETECTOR;
 
-    // bool FLAG;     uninitializedFlag is not initialized here, so it has an 
-    //                indeterminate value
-    //  bool FLAG{};  initializedFlag is initialized to false due to the {}
+    // Flag indicating the result of ALU operations
     bool FLAG{};
+
+    // Flag indicating zero result of ALU operations
     bool ZERO_FLAG{};
+
+    // Flag indicating the sign of the result of ALU operations
     bool SIGN_FLAG{};
+
+    // Flag indicating carry-out in ALU operations
     bool CARRY_FLAG{};
+
+    // Flag indicating overflow in ALU operations
     bool OVERFLOW_FLAG{};
+
+    // Flag indicating whether the pipeline stage is in a branch delay slot
     bool BRANCH_DELAY_SLOT{};
 };
 
@@ -327,11 +377,19 @@ class MemoryStage : public Stage
 
     MemAddress PC{};
     /* TODO: add other necessary fields/buffers */
+    // Control signals for the pipeline stage
     ControlSignals CONTROL_SIGNALS;
 
+    // Register RD to store the result of ALU operations
     RegNumber RD{0};
+
+    // Result of ALU operations
     RegValue ALU_RESULT{};
+
+    // Data read from memory
     RegValue DATA_READ_FROM_MEMORY{};
+
+    // Reference to the Hazard Detector, which identifies hazards in the pipeline
     const HazardDetector &HAZARD_DETECTOR;
 };
 
@@ -363,12 +421,19 @@ class WriteBackStage : public Stage
     RegisterFile &regfile;
 
     /* TODO add other necessary fields/buffers and components */
-
+    // Program Counter (PC) to keep track of the current instruction address
     MemAddress PC{};
 
+    // Reference to a boolean flag
     bool &flag;
+
+    // Reference to a counter tracking the number of completed instructions
     uint64_t &nInstrCompleted;
+
+    // Control signals for the pipeline stage
     ControlSignals CONTROL_SIGNALS;
+
+    // Hazard Detector responsible for identifying hazards in the pipeline
     HazardDetector &HAZARD_DETECTOR;
 };
 
